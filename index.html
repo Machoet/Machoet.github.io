@@ -3,71 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的第一个GitHub Pages网站</title>
+    <title>小佬r · 临时页</title>
     <style>
-        /* 一些简单的样式让页面更好看 */
+        /* ====== 全局重置 ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0b0b0f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(0, 200, 150, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(0, 150, 200, 0.05) 0%, transparent 60%);
+            position: relative;
+        }
+
+        /* 微妙的颗粒感纹理 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ====== 主卡片（玻璃态） ====== */
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(18, 22, 30, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 32px;
+            padding: 4rem 3rem;
+            border: 1px solid rgba(0, 200, 150, 0.12);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(0, 200, 150, 0.05) inset,
+                0 0 60px rgba(0, 200, 150, 0.02);
+            position: relative;
+            z-index: 1;
             text-align: center;
-            background-color: #f0f4f8;
-            color: #1a1a2e;
         }
-        h1 {
-            color: #2d4059;
-            border-bottom: 3px solid #ea5455;
-            padding-bottom: 10px;
+
+        /* 顶部光线装饰 */
+        .container::after {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 60%;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(0, 200, 150, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ====== 主要内容 ====== */
+        .main-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-text .greeting {
+            font-size: 1rem;
+            color: #6b7f92;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        .main-text .name {
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #e8edf5;
+            letter-spacing: 0.04em;
+            line-height: 1.2;
+        }
+
+        .main-text .name .highlight {
+            color: #00d4aa;
+        }
+
+        .main-text .status {
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            color: #6b7f92;
+        }
+
+        .main-text .status .dot {
             display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00d4aa;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+            animation: pulse-dot 2s ease-in-out infinite;
         }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin: 30px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
         }
-        .emoji-big {
-            font-size: 48px;
-            display: block;
-            margin: 10px 0;
+
+        .main-text .sub {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #4a5f72;
+            letter-spacing: 0.05em;
         }
+
+        /* ====== 页脚 ====== */
         .footer {
-            margin-top: 40px;
-            font-size: 14px;
-            color: #6b7b8d;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #3a4f62;
+            border-top: 1px solid rgba(0, 200, 150, 0.06);
+            position: relative;
+            z-index: 1;
         }
-        a {
-            color: #ea5455;
-            text-decoration: none;
+
+        /* ====== 响应式 ====== */
+        @media (max-width: 640px) {
+            .container {
+                padding: 3rem 1.5rem;
+                border-radius: 24px;
+            }
+            .main-text .name {
+                font-size: 3rem;
+            }
         }
-        a:hover {
-            text-decoration: underline;
+
+        @media (max-width: 420px) {
+            .main-text .name {
+                font-size: 2.4rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>🚀 部署成功！</h1>
-    
-    <div class="card">
-        <span class="emoji-big">🎉</span>
-        <p>如果你的浏览器能看到这个页面，说明你已经成功通过 <strong>GitHub Pages</strong> 托管了一个网站。</p>
-        <p>这个HTML文件存放在你的 <code>用户名.github.io</code> 仓库中。</p>
+
+<div class="container">
+
+    <!-- ====== 主内容 ====== -->
+    <div class="main-text">
+        <div class="greeting">✦ 临时页面 ✦</div>
+        <div class="name">
+            我是<span class="highlight">小佬r</span>
+        </div>
+        <div class="status">
+            <span class="dot"></span>
+            正在建设中 ...
+        </div>
+        <div class="sub">
+            // 稍后回来，会有更多内容
+        </div>
     </div>
 
-    <div class="card">
-        <h3>📝 下一步可以：</h3>
-        <ul style="text-align: left; display: inline-block;">
-            <li>修改这个 <code>index.html</code> 文件，设计自己的页面</li>
-            <li>添加更多页面，例如 <code>about.html</code></li>
-            <li>上传 CSS、JavaScript 或图片文件夹</li>
-            <li>绑定自己的独立域名</li>
-        </ul>
-    </div>
-
+    <!-- ====== 页脚 ====== -->
     <div class="footer">
-        <p>由 GitHub Pages 驱动 · <a href="https://docs.github.com/zh/pages" target="_blank">查看官方文档</a></p>
+        <span>由 GitHub Pages 驱动</span>
     </div>
+
+</div>
+
 </body>
 </html>
