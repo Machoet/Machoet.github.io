@@ -528,12 +528,14 @@ footer a:hover { color: var(--amber); border-color: var(--amber); }
  *   1. title    : 资料标题（显示在卡片上的名字）
  *   2. category : 分类 key，必须是 CATEGORIES 里已有的 key
  *                 （book 类：graphics / cpp / se / algo；
- *                  笔记文档类：note）。要新增分类，先在
- *                 CATEGORIES 中加一行再使用。
+ *                  笔记文档类：note）。建议先在 CATEGORIES
+ *                 中登记新分类（可自定义名称与颜色）；未登记
+ *                 的 key 也会渲染，只是直接用 key 当名称。
  *   3. size     : 文件大小的展示文本，如 "317 MB"（纯链接可留 ""）
  *   4. href     : 链接地址。仓库内文件写相对路径，中文/空格
  *                 无需手动编码，渲染时会自动 encodeURI 处理；
- *                 外部链接直接写完整 https:// 地址。
+ *                 凡带协议前缀的链接（https:// / mailto: /
+ *                 tel: 等）会原样使用、不做编码。
  *   5. type     : "pdf" | "note" | "link"，决定图标与所属分区
  *                 （pdf 显示在书籍区，note/link 显示在笔记区）
  *   6. desc     : 一句话简介（可为空字符串）
@@ -598,9 +600,9 @@ function escapeHtml(s) {
   }[c]));
 }
 
-/* 相对路径中的中文与空格做 URL 编码；完整外链原样返回 */
+/* 相对路径中的中文与空格做 URL 编码；带协议的链接（https:、mailto:、tel: 等）原样返回 */
 function encodeHref(href) {
-  if (/^https?:\/\//i.test(href)) return href;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href)) return href;
   return href.split('/').map(encodeURIComponent).join('/');
 }
 
@@ -611,7 +613,7 @@ const ICONS = {
 };
 
 function cardHTML(item, delay) {
-  const cat = CATEGORIES[item.category] || { name: item.category, color: 'var(--amber)' };
+  const cat = catInfo(item.category);
   const external = /^https?:\/\//i.test(item.href);
   return `
     <a class="card rise" style="--cat:${cat.color};animation-delay:${delay}s"
@@ -634,6 +636,21 @@ function emptyHTML(text) {
   return `<div class="empty"><span class="glyph">🌙</span>${escapeHtml(text)}</div>`;
 }
 
+/* 分类信息（未在 CATEGORIES 登记的 key 用 fallback 名称/颜色兜底） */
+function catInfo(key) {
+  return CATEGORIES[key] || { name: key, color: 'var(--amber)' };
+}
+
+/* 书籍分类 key 列表：CATEGORIES 定义的顺序优先，
+   数据中出现但未登记的分类追加在后面，确保条目不会静默丢失 */
+function bookCategoryKeys() {
+  const keys = Object.keys(CATEGORIES).filter(k => k !== 'note');
+  for (const b of books) {
+    if (!keys.includes(b.category)) keys.push(b.category);
+  }
+  return keys;
+}
+
 /* ---- 渲染书籍区：按分类分组 ---- */
 function renderBooks() {
   const kw = keyword.trim().toLowerCase();
@@ -653,13 +670,12 @@ function renderBooks() {
 
   let html = '';
   let delay = 0;
-  for (const key of Object.keys(CATEGORIES)) {
-    if (key === 'note') continue;
+  for (const key of bookCategoryKeys()) {
     const group = visible.filter(b => b.category === key);
     if (!group.length) continue;
     html += `
       <div class="section-head">
-        <h2>${escapeHtml(CATEGORIES[key].name)}</h2>
+        <h2>${escapeHtml(catInfo(key).name)}</h2>
         <span class="tally">${group.length} 本</span>
       </div>
       <div class="card-grid">
@@ -680,24 +696,35 @@ function renderNotes() {
 /* ---- 分类筛选按钮 ---- */
 function renderChips() {
   const chips = [{ key: 'all', name: '全部', count: books.length }]
-    .concat(Object.keys(CATEGORIES)
-      .filter(k => k !== 'note')
-      .map(k => ({ key: k, name: CATEGORIES[k].name, count: books.filter(b => b.category === k).length })));
+    .concat(bookCategoryKeys()
+      .map(k => ({ key: k, name: catInfo(k).name, count: books.filter(b => b.category === k).length })));
 
   $('#chipBar').innerHTML = chips.map(c => `
-    <button class="chip${c.key === activeCategory ? ' active' : ''}" data-cat="${c.key}"
+    <button class="chip${c.key === activeCategory ? ' active' : ''}" data-cat="${escapeHtml(c.key)}"
             role="tab" aria-selected="${c.key === activeCategory}">
       ${escapeHtml(c.name)}<span class="count">${c.count}</span>
     </button>`).join('');
 }
 
 /* ---- 顶部统计 ---- */
+/* 解析 "317 MB" 这类 size 文本为 MB 数值，无法解析按 0 处理 */
+function parseSizeMB(size) {
+  const m = /([\d.]+)\s*(GB|MB|KB)/i.exec(size || '');
+  if (!m) return 0;
+  const mul = { KB: 1 / 1024, MB: 1, GB: 1024 }[m[2].toUpperCase()];
+  return parseFloat(m[1]) * mul;
+}
+
+function formatTotalSize(mb) {
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${Math.round(mb)} MB`;
+}
+
 function renderStats() {
-  const totalGB = 1.6; // 12 本 PDF 合计约 1.6 GB
+  const totalMB = RESOURCES.reduce((sum, r) => sum + parseSizeMB(r.size), 0);
   $('#heroStats').innerHTML = `
     <div class="stat"><b>${books.length}</b><span>册藏书</span></div>
-    <div class="stat"><b>${Object.keys(CATEGORIES).length - 1}</b><span>个分类</span></div>
-    <div class="stat"><b>${totalGB} GB</b><span>资料体积</span></div>
+    <div class="stat"><b>${bookCategoryKeys().length}</b><span>个分类</span></div>
+    <div class="stat"><b>${formatTotalSize(totalMB)}</b><span>资料体积</span></div>
     <div class="stat"><b>${notes.length || '···'}</b><span>笔记文档</span></div>`;
 }
 
