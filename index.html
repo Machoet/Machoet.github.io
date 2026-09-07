@@ -3,30 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Machoet · 个人资料库</title>
-<meta name="description" content="Machoet 的个人资料记录站：图形学、游戏开发、C++、算法等学习书籍与文档的收藏索引，方便随时查找。">
+<title>Machoet · 资料库</title>
+<meta name="description" content="Machoet 的个人资料库，收录图形学、游戏开发、C++、算法等学习书籍与文档。">
 <style>
 /* ============================================================
-   Machoet 个人资料库 —— 深夜书房主题
-   深色底 + 玻璃态卡片 + 暖琥珀灯光，纯 CSS，无外部依赖
+   Machoet —— 深色开发者主题
+   近黑背景 + 玻璃态卡片，GitHub 绿点缀 + VS Code Dark+ 分类色板
+   纯 CSS，无外部依赖
    ============================================================ */
 :root {
-  --bg-0: #0a0d14;            /* 最深的底色：墨蓝黑 */
-  --bg-1: #0e1320;
-  --ink: #e9e4d8;             /* 米白，像旧书纸页 */
-  --ink-dim: #9a93a8;
-  --ink-faint: #5d5870;
-  --amber: #e8b45f;           /* 主强调色：台灯琥珀 */
-  --amber-soft: rgba(232, 180, 95, 0.14);
-  --glass: rgba(22, 27, 41, 0.62);
-  --glass-border: rgba(233, 228, 216, 0.09);
-  --glass-hover: rgba(233, 228, 216, 0.2);
-  /* 分类色 */
-  --c-graphics: #6fd3c7;
-  --c-cpp: #7ea6f4;
-  --c-se: #e59aa8;
-  --c-algo: #b3e07f;
-  --c-note: #c9a2ec;
+  --bg-0: #0d0d0d;            /* 最深的底色：近黑 */
+  --bg-1: #141414;
+  --ink: #e6edf3;             /* 主文字：灰白 */
+  --ink-dim: #9198a1;
+  --ink-faint: #59616b;
+  --accent: #56d364;          /* 主强调色：GitHub 绿（亮） */
+  --accent-dim: #3fb950;      /* GitHub 绿（暗，用于边框） */
+  --accent-soft: rgba(63, 185, 80, 0.12);
+  --glass: rgba(22, 24, 26, 0.62);
+  --glass-border: rgba(240, 246, 252, 0.09);
+  --glass-hover: rgba(240, 246, 252, 0.22);
+  /* 分类色：VS Code Dark+ 低饱和色板 */
+  --c-graphics: #4ec9b0;      /* 青绿（类型色） */
+  --c-cpp: #569cd6;           /* 蓝（关键字色） */
+  --c-se: #c586c0;            /* 紫（控制流色） */
+  --c-algo: #ce9178;          /* 橙（字符串色） */
+  --c-note: #dcdcaa;          /* 黄（函数名色） */
   --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', SimSun, Georgia, serif;
   --font-body: 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
   --font-mono: 'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace;
@@ -52,9 +54,9 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 42% at 78% -6%, rgba(232, 180, 95, 0.13) 0%, transparent 65%),
-    radial-gradient(ellipse 48% 40% at 8% 24%, rgba(111, 211, 199, 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 108%, rgba(126, 166, 244, 0.08) 0%, transparent 62%),
+    radial-gradient(ellipse 55% 42% at 78% -6%, rgba(63, 185, 80, 0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 48% 40% at 8% 24%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 108%, rgba(86, 156, 214, 0.04) 0%, transparent 62%),
     linear-gradient(175deg, var(--bg-1) 0%, var(--bg-0) 55%);
 }
 .backdrop::after {
@@ -63,7 +65,16 @@ body {
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 }
-/* 缓慢漂浮的光晕 */
+
+/* 背景星空画布（灰白粒子，JS 绘制） */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 缓慢飘浮的光晕 */
 .orb {
   position: fixed;
   border-radius: 50%;
@@ -73,8 +84,8 @@ body {
   opacity: 0.5;
   animation: drift 26s ease-in-out infinite alternate;
 }
-.orb-a { width: 420px; height: 420px; top: -140px; right: -100px; background: rgba(232, 180, 95, 0.10); }
-.orb-b { width: 360px; height: 360px; bottom: -120px; left: -120px; background: rgba(126, 166, 244, 0.09); animation-delay: -13s; }
+.orb-a { width: 420px; height: 420px; top: -140px; right: -100px; background: rgba(63, 185, 80, 0.05); }
+.orb-b { width: 360px; height: 360px; bottom: -120px; left: -120px; background: rgba(255, 255, 255, 0.04); animation-delay: -13s; }
 @keyframes drift {
   from { transform: translate(0, 0) scale(1); }
   to   { transform: translate(-50px, 46px) scale(1.15); }
@@ -83,7 +94,7 @@ body {
 .page {
   position: relative;
   z-index: 1;
-  max-width: 1080px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -96,72 +107,143 @@ body {
 .rise { opacity: 0; animation: rise 0.7s cubic-bezier(0.22, 0.9, 0.3, 1) forwards; }
 
 /* ============================================================
-   头部 · 个人简介
+   顶部导航栏（sticky + 毛玻璃）
    ============================================================ */
-.hero {
-  padding: 88px 0 56px;
+.topnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(13, 13, 13, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--glass-border);
+}
+.topnav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 60px;
   display: flex;
   align-items: center;
-  gap: 36px;
-  flex-wrap: wrap;
+  gap: 18px;
+}
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand:hover { color: var(--accent); }
+.nav-links {
+  display: flex;
+  gap: 4px;
+  margin: 0 auto;
+}
+.nav-links a {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-links a:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.nav-icons { display: flex; gap: 8px; }
+.nav-icons a {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  display: grid;
+  place-items: center;
+  color: var(--ink-dim);
+  transition: color 0.2s, border-color 0.2s;
+}
+.nav-icons a:hover { color: var(--accent); border-color: rgba(63, 185, 80, 0.45); }
+.nav-icons svg { width: 16px; height: 16px; }
+
+/* ============================================================
+   Hero · 个人简介（垂直居中，约 70vh）
+   ============================================================ */
+.hero {
+  min-height: 70vh;
+  padding: 56px 0 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  scroll-margin-top: 76px;
 }
 .avatar {
   flex-shrink: 0;
   width: 112px;
   height: 112px;
+  margin: 28px 0 24px;
   border-radius: 50%;
-  display: grid;
+  background: #1a1a1a;
+  box-shadow:
+    0 0 0 1px rgba(240, 246, 252, 0.18),
+    0 0 0 9px rgba(63, 185, 80, 0.05),
+    0 18px 44px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+.avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* 头像加载失败时的字母后备（默认隐藏，img onerror 时显示） */
+.avatar-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
   place-items: center;
   font-family: var(--font-display);
   font-size: 3rem;
   font-weight: 700;
   color: var(--bg-0);
-  background: linear-gradient(140deg, #f3d9a4 0%, var(--amber) 48%, #b97e2e 100%);
-  box-shadow:
-    0 0 0 1px rgba(232, 180, 95, 0.35),
-    0 0 0 9px rgba(232, 180, 95, 0.06),
-    0 18px 44px rgba(232, 180, 95, 0.18);
-  position: relative;
+  background: linear-gradient(140deg, #f2f2f2 0%, #c4c4c4 48%, #7d7d7d 100%);
 }
-.avatar::after {           /* 呼吸光环 */
+.avatar::after {           /* 外圈虚线装饰 */
   content: '';
   position: absolute;
   inset: -9px;
   border-radius: 50%;
-  border: 1px dashed rgba(232, 180, 95, 0.35);
+  border: 1px dashed rgba(63, 185, 80, 0.35);
   animation: spin 40s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.hero-text { flex: 1; min-width: 260px; }
 .hero-eyebrow {
   font-family: var(--font-mono);
   font-size: 0.78rem;
   letter-spacing: 0.28em;
-  color: var(--amber);
-  margin-bottom: 10px;
+  color: var(--accent);
 }
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 5vw, 3.1rem);
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.02em;
 }
-.hero-title em {
-  font-style: normal;
-  background: linear-gradient(120deg, #f3d9a4, var(--amber));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
 .hero-bio {
-  margin-top: 14px;
+  margin-top: 16px;
   max-width: 560px;
   color: var(--ink-dim);
-  font-size: 0.95rem;
+  font-size: 0.98rem;
 }
-.hero-links { margin-top: 22px; display: flex; gap: 12px; flex-wrap: wrap; }
 .social-link {
   display: inline-flex;
   align-items: center;
@@ -175,24 +257,24 @@ body {
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, color 0.25s;
 }
-.social-link svg { width: 18px; height: 18px; }
 .social-link:hover {
   transform: translateY(-2px);
-  border-color: var(--glass-hover);
+  color: var(--accent);
+  border-color: rgba(63, 185, 80, 0.45);
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
 }
-.social-link.csdn:hover { border-color: rgba(252, 85, 49, 0.55); }
-.social-link.bili:hover { border-color: rgba(0, 174, 236, 0.55); }
 
 /* 统计条 */
 .hero-stats {
   width: 100%;
+  max-width: 820px;
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  margin-top: 6px;
+  justify-content: center;
+  margin-top: 44px;
 }
 .stat {
   flex: 1;
@@ -208,16 +290,45 @@ body {
   display: block;
   font-family: var(--font-mono);
   font-size: 1.5rem;
-  color: var(--amber);
+  color: var(--accent);
   line-height: 1.3;
 }
 .stat span { font-size: 0.78rem; color: var(--ink-faint); letter-spacing: 0.08em; }
 
 /* ============================================================
-   工具栏 · 搜索 + 分类筛选
+   内容板块与工具栏
    ============================================================ */
+.block {
+  margin-top: 96px;
+  scroll-margin-top: 84px;      /* 锚点跳转时避开 sticky 导航 */
+}
+.block-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+.block-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.block-head .tally {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.block-head .rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--glass-border), transparent);
+}
+
 .toolbar {
-  margin: 40px 0 34px;
+  margin: 0 0 30px;
   padding: 18px;
   border-radius: 20px;
   background: var(--glass);
@@ -228,7 +339,7 @@ body {
   flex-direction: column;
   gap: 14px;
   position: sticky;
-  top: 14px;
+  top: 74px;                    /* 避开顶部导航栏 */
   z-index: 5;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
 }
@@ -248,7 +359,7 @@ body {
   padding: 12px 16px 12px 46px;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
-  background: rgba(10, 13, 20, 0.55);
+  background: rgba(10, 10, 10, 0.55);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 0.94rem;
@@ -257,8 +368,8 @@ body {
 }
 #searchInput::placeholder { color: var(--ink-faint); }
 #searchInput:focus {
-  border-color: rgba(232, 180, 95, 0.5);
-  box-shadow: 0 0 0 3px rgba(232, 180, 95, 0.12);
+  border-color: rgba(63, 185, 80, 0.55);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .chip {
@@ -274,9 +385,9 @@ body {
 }
 .chip:hover { color: var(--ink); border-color: var(--glass-hover); }
 .chip.active {
-  background: var(--amber-soft);
-  border-color: rgba(232, 180, 95, 0.55);
-  color: var(--amber);
+  background: var(--accent-soft);
+  border-color: rgba(63, 185, 80, 0.55);
+  color: var(--accent);
 }
 .chip .count { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.75; margin-left: 4px; }
 
@@ -289,9 +400,9 @@ body {
   gap: 14px;
   margin: 46px 0 20px;
 }
-.section-head h2 {
+.section-head h3 {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -333,13 +444,13 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--cat, var(--amber)), transparent 75%);
+  background: linear-gradient(90deg, var(--cat, var(--accent)), transparent 75%);
   opacity: 0.65;
 }
 .card:hover {
   transform: translateY(-5px);
   border-color: var(--glass-hover);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45), 0 0 30px -12px var(--cat, var(--amber));
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45), 0 0 30px -12px var(--cat, var(--accent));
 }
 /* 书脊样式的图标块 */
 .card-spine {
@@ -347,12 +458,12 @@ body {
   width: 46px;
   height: 62px;
   border-radius: 5px 9px 9px 5px;
-  background: linear-gradient(155deg, color-mix(in srgb, var(--cat, var(--amber)) 30%, #1a2030), #131828);
-  border: 1px solid color-mix(in srgb, var(--cat, var(--amber)) 35%, transparent);
-  border-left: 4px solid var(--cat, var(--amber));
+  background: linear-gradient(155deg, color-mix(in srgb, var(--cat, var(--accent)) 22%, #1c1c1c), #151515);
+  border: 1px solid color-mix(in srgb, var(--cat, var(--accent)) 35%, transparent);
+  border-left: 4px solid var(--cat, var(--accent));
   display: grid;
   place-items: center;
-  color: var(--cat, var(--amber));
+  color: var(--cat, var(--accent));
   transition: transform 0.3s;
 }
 .card:hover .card-spine { transform: rotate(-4deg) translateY(-2px); }
@@ -366,7 +477,7 @@ body {
   margin-bottom: 4px;
   transition: color 0.25s;
 }
-.card:hover .card-title { color: var(--cat, var(--amber)); }
+.card:hover .card-title { color: var(--cat, var(--accent)); }
 .card-desc {
   font-size: 0.8rem;
   color: var(--ink-dim);
@@ -387,15 +498,15 @@ body {
 .card-meta .tag {
   padding: 2px 9px;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--cat, var(--amber)) 40%, transparent);
-  color: var(--cat, var(--amber));
+  border: 1px solid color-mix(in srgb, var(--cat, var(--accent)) 40%, transparent);
+  color: var(--cat, var(--accent));
 }
 .card-meta .open-hint {
   margin-left: auto;
   opacity: 0;
   transform: translateX(-6px);
   transition: opacity 0.25s, transform 0.25s;
-  color: var(--cat, var(--amber));
+  color: var(--cat, var(--accent));
 }
 .card:hover .open-hint { opacity: 1; transform: translateX(0); }
 
@@ -404,37 +515,81 @@ body {
   padding: 52px 24px;
   border-radius: 18px;
   border: 1px dashed var(--glass-border);
-  background: rgba(22, 27, 41, 0.35);
+  background: rgba(24, 24, 24, 0.35);
   text-align: center;
   color: var(--ink-faint);
   font-size: 0.9rem;
 }
-.empty .glyph { font-size: 2rem; display: block; margin-bottom: 10px; opacity: 0.7; }
 
 /* ============================================================
    页脚
    ============================================================ */
 footer {
-  margin-top: 90px;
-  padding: 34px 0 44px;
+  margin-top: 110px;
+  padding: 44px 0 52px;
   border-top: 1px solid var(--glass-border);
-  text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--ink-faint);
 }
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+.footer-brand {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+/* 终端风格概况面板 */
+.footer-panel {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.9;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: rgba(24, 24, 24, 0.5);
+  color: var(--ink-dim);
+  white-space: pre;
+  text-align: left;
+  min-width: 220px;
+}
+.footer-panel .p { color: var(--accent); }
+.footer-panel .k { color: var(--ink-faint); }
+.footer-panel .v { color: var(--ink); }
+.footer-links { display: flex; gap: 10px; flex-wrap: wrap; }
 footer .mono { font-family: var(--font-mono); letter-spacing: 0.06em; }
 footer a { color: var(--ink-dim); text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
-footer a:hover { color: var(--amber); border-color: var(--amber); }
+footer a:hover { color: var(--accent); border-color: var(--accent); }
+footer .footer-links a { border-bottom: none; }
 
 /* ============================================================
    响应式
    ============================================================ */
 @media (max-width: 640px) {
-  .hero { padding: 56px 0 40px; gap: 24px; }
-  .avatar { width: 88px; height: 88px; font-size: 2.3rem; }
+  .topnav-inner { padding: 0 14px; gap: 8px; height: 54px; overflow-x: auto; }
+  .nav-links a { padding: 6px 10px; font-size: 0.8rem; }
+  .hero { min-height: 62vh; padding: 40px 0 32px; }
+  .avatar { width: 88px; height: 88px; margin: 22px 0 18px; }
+  .avatar-fallback { font-size: 2.3rem; }
+  .block { margin-top: 72px; }
   .toolbar { position: static; padding: 14px; }
   .card-grid { grid-template-columns: 1fr; }
   .stat { min-width: calc(50% - 6px); }
+  .footer-inner { flex-direction: column; align-items: flex-start; }
+  .footer-right { align-items: flex-start; }
+  .footer-panel { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -446,63 +601,81 @@ footer a:hover { color: var(--amber); border-color: var(--amber); }
 <body>
 
 <div class="backdrop" aria-hidden="true"></div>
+<canvas id="starfield" aria-hidden="true"></canvas>
 <div class="orb orb-a" aria-hidden="true"></div>
 <div class="orb orb-b" aria-hidden="true"></div>
 
+<!-- ============ 顶部导航栏 ============ -->
+<header class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="#top">Machoet</a>
+    <nav class="nav-links" aria-label="页内导航">
+      <a href="#top">首页</a>
+      <a href="#books">资料库</a>
+      <a href="#notes">笔记</a>
+    </nav>
+    <div class="nav-icons">
+      <a href="https://blog.csdn.net/weixin_56946623?spm=1000.2115.3001.5343" target="_blank" rel="noopener noreferrer" aria-label="CSDN 博客" title="CSDN 博客">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.2"/>
+          <path d="M15.5 8.6c-.9-.7-2.1-1.1-3.4-1.1-3 0-5.1 1.9-5.1 4.5s2.1 4.5 5.1 4.5c1.3 0 2.5-.4 3.4-1.1"/>
+        </svg>
+      </a>
+      <a href="https://space.bilibili.com/668352616?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer" aria-label="B站主页" title="B站主页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="7" width="18" height="13" rx="3"/>
+          <path d="M7.5 3.5 10 6.8M16.5 3.5 14 6.8"/>
+          <path d="M8.5 11.5v3M15.5 11.5v3"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</header>
+
 <div class="page">
 
-  <!-- ============ 头部 · 个人简介 ============ -->
-  <header class="hero">
-    <div class="avatar rise" style="animation-delay:.05s" aria-hidden="true">M</div>
-    <div class="hero-text">
-      <p class="hero-eyebrow rise" style="animation-delay:.1s">MACHOET · 资料库</p>
-      <h1 class="hero-title rise" style="animation-delay:.16s">深夜书房，<em>存我所学</em></h1>
-      <p class="hero-bio rise" style="animation-delay:.24s">
-        你好，我是 <strong>Machoet</strong>。这里是我的个人资料记录站，
-        收录图形学、游戏开发、C++ 与算法方向的学习书籍和文档，方便日后随时翻阅查找。
-      </p>
-      <nav class="hero-links rise" style="animation-delay:.32s" aria-label="社交链接">
-        <a class="social-link csdn" href="https://blog.csdn.net/weixin_56946623?spm=1000.2115.3001.5343" target="_blank" rel="noopener noreferrer">
-          <!-- CSDN：博客钢笔图标 -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fc5531" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9.2"/>
-            <path d="M15.5 8.6c-.9-.7-2.1-1.1-3.4-1.1-3 0-5.1 1.9-5.1 4.5s2.1 4.5 5.1 4.5c1.3 0 2.5-.4 3.4-1.1"/>
-          </svg>
-          CSDN 博客
-        </a>
-        <a class="social-link bili" href="https://space.bilibili.com/668352616?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer">
-          <!-- B站：小电视图标 -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="#00aeec" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="7" width="18" height="13" rx="3"/>
-            <path d="M7.5 3.5 10 6.8M16.5 3.5 14 6.8"/>
-            <path d="M8.5 11.5v3M15.5 11.5v3"/>
-          </svg>
-          B站主页
-        </a>
-      </nav>
+  <!-- ============ Hero · 个人简介 ============ -->
+  <header class="hero" id="top">
+    <p class="hero-eyebrow rise" style="animation-delay:.05s">MACHOET.GITHUB.IO</p>
+    <div class="avatar rise" style="animation-delay:.12s">
+      <img src="https://github.com/Machoet.png" alt="Machoet"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+      <span class="avatar-fallback" aria-hidden="true">M</span>
     </div>
-    <div class="hero-stats rise" style="animation-delay:.4s" id="heroStats"></div>
+    <h1 class="hero-title rise" style="animation-delay:.2s">Machoet</h1>
+    <p class="hero-bio rise" style="animation-delay:.28s">
+      这里是我的个人资料库，收录学习书籍与文档，方便日后查找。
+    </p>
+    <div class="hero-stats rise" style="animation-delay:.38s" id="heroStats"></div>
   </header>
 
   <main>
-    <!-- ============ 搜索与筛选 ============ -->
-    <section class="toolbar rise" style="animation-delay:.48s" aria-label="搜索与筛选">
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>
-        </svg>
-        <input id="searchInput" type="search" placeholder="按书名搜索，例如「Vulkan」「设计模式」…" autocomplete="off" aria-label="搜索资料">
+    <!-- ============ 书籍资料库板块 ============ -->
+    <section id="books" class="block" aria-label="书籍资料库">
+      <div class="block-head rise" style="animation-delay:.46s">
+        <h2>书籍资料库</h2>
+        <span class="rule"></span>
+        <span class="tally" id="bookTally"></span>
       </div>
-      <div class="chips" id="chipBar" role="tablist" aria-label="分类筛选"></div>
+
+      <div class="toolbar rise" style="animation-delay:.5s" aria-label="搜索与筛选">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>
+          </svg>
+          <input id="searchInput" type="search" placeholder="按书名搜索，例如「Vulkan」「设计模式」…" autocomplete="off" aria-label="搜索资料">
+        </div>
+        <div class="chips" id="chipBar" role="tablist" aria-label="分类筛选"></div>
+      </div>
+
+      <div id="bookArea"></div>
     </section>
 
-    <!-- ============ 书籍资料区（JS 渲染） ============ -->
-    <section id="bookArea" aria-label="书籍资料"></section>
-
-    <!-- ============ 笔记 / 文档扩展区（JS 渲染） ============ -->
-    <section aria-label="笔记与文档">
-      <div class="section-head rise" style="animation-delay:.55s">
-        <h2>📝 笔记 / 文档</h2>
+    <!-- ============ 笔记 / 文档板块 ============ -->
+    <section id="notes" class="block" aria-label="笔记与文档">
+      <div class="block-head rise" style="animation-delay:.55s">
+        <h2>笔记 / 文档</h2>
+        <span class="rule"></span>
         <span class="tally" id="noteTally"></span>
       </div>
       <div id="noteArea"></div>
@@ -511,8 +684,21 @@ footer a:hover { color: var(--amber); border-color: var(--amber); }
 
   <!-- ============ 页脚 ============ -->
   <footer>
-    <p>© <span id="year"></span> Machoet · 学而时习之</p>
-    <p class="mono" style="margin-top:6px">Powered by <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a></p>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <p class="footer-brand">Machoet</p>
+        <p>© <span id="year"></span> Machoet · 个人资料库</p>
+        <p class="mono" style="margin-top:6px">Powered by <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a></p>
+      </div>
+      <div class="footer-right">
+        <div class="footer-panel" id="footerPanel" aria-label="站点概况"></div>
+        <div class="footer-links">
+          <a class="social-link" href="https://blog.csdn.net/weixin_56946623?spm=1000.2115.3001.5343" target="_blank" rel="noopener noreferrer">CSDN</a>
+          <a class="social-link" href="https://space.bilibili.com/668352616?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer">B站</a>
+          <a class="social-link" href="https://github.com/Machoet" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+    </div>
   </footer>
 
 </div>
@@ -521,7 +707,7 @@ footer a:hover { color: var(--amber); border-color: var(--amber); }
 'use strict';
 
 /* ============================================================
- * 📚 资料数据（整个页面由这个数组驱动）
+ * 资料数据（整个页面由这个数组驱动）
  * ------------------------------------------------------------
  * ★ 如何添加新资料 —— 只需在 RESOURCES 数组末尾加一条对象：
  *
@@ -633,12 +819,12 @@ function cardHTML(item, delay) {
 }
 
 function emptyHTML(text) {
-  return `<div class="empty"><span class="glyph">🌙</span>${escapeHtml(text)}</div>`;
+  return `<div class="empty">${escapeHtml(text)}</div>`;
 }
 
 /* 分类信息（未在 CATEGORIES 登记的 key 用 fallback 名称/颜色兜底） */
 function catInfo(key) {
-  return CATEGORIES[key] || { name: key, color: 'var(--amber)' };
+  return CATEGORIES[key] || { name: key, color: 'var(--accent)' };
 }
 
 /* 书籍分类 key 列表：CATEGORIES 定义的顺序优先，
@@ -660,11 +846,12 @@ function renderBooks() {
 
   const visible = books.filter(match);
   const area = $('#bookArea');
+  $('#bookTally').textContent = visible.length === books.length
+    ? `共 ${books.length} 本`
+    : `${visible.length} / ${books.length} 本`;
 
   if (!visible.length) {
-    area.innerHTML = `
-      <div class="section-head"><h2>📚 书籍资料</h2><span class="tally">0 本</span></div>
-      ${emptyHTML('没有找到匹配的资料，换个关键词试试？')}`;
+    area.innerHTML = emptyHTML('没有找到匹配的资料。');
     return;
   }
 
@@ -675,7 +862,7 @@ function renderBooks() {
     if (!group.length) continue;
     html += `
       <div class="section-head">
-        <h2>${escapeHtml(catInfo(key).name)}</h2>
+        <h3>${escapeHtml(catInfo(key).name)}</h3>
         <span class="tally">${group.length} 本</span>
       </div>
       <div class="card-grid">
@@ -687,10 +874,10 @@ function renderBooks() {
 
 /* ---- 渲染笔记 / 文档区 ---- */
 function renderNotes() {
-  $('#noteTally').textContent = notes.length ? `${notes.length} 篇` : '';
+  $('#noteTally').textContent = `共 ${notes.length} 篇`;
   $('#noteArea').innerHTML = notes.length
     ? `<div class="card-grid">${notes.map((n, i) => cardHTML(n, 0.1 + i * 0.05)).join('')}</div>`
-    : emptyHTML('暂无笔记，敬请期待 —— 在页面源码的 RESOURCES 数组中添加 type 为 "note" 或 "link" 的条目即可。');
+    : emptyHTML('暂无笔记。在页面源码的 RESOURCES 数组中添加 type 为 "note" 或 "link" 的条目即可。');
 }
 
 /* ---- 分类筛选按钮 ---- */
@@ -725,7 +912,18 @@ function renderStats() {
     <div class="stat"><b>${books.length}</b><span>册藏书</span></div>
     <div class="stat"><b>${bookCategoryKeys().length}</b><span>个分类</span></div>
     <div class="stat"><b>${formatTotalSize(totalMB)}</b><span>资料体积</span></div>
-    <div class="stat"><b>${notes.length || '···'}</b><span>笔记文档</span></div>`;
+    <div class="stat"><b>${notes.length}</b><span>笔记文档</span></div>`;
+}
+
+/* ---- 页脚概况面板（终端风格，复用同一套统计数据） ---- */
+function renderFooterPanel() {
+  const totalMB = RESOURCES.reduce((sum, r) => sum + parseSizeMB(r.size), 0);
+  $('#footerPanel').innerHTML =
+    `<span class="p">$ stats</span>\n` +
+    `<span class="k">books</span> : <span class="v">${books.length}</span>\n` +
+    `<span class="k">size </span> : <span class="v">${formatTotalSize(totalMB)}</span>\n` +
+    `<span class="k">cats </span> : <span class="v">${bookCategoryKeys().length}</span>\n` +
+    `<span class="k">notes</span> : <span class="v">${notes.length}</span>`;
 }
 
 /* ---- 事件绑定 ---- */
@@ -745,9 +943,102 @@ $('#searchInput').addEventListener('input', e => {
 /* ---- 初始渲染 ---- */
 $('#year').textContent = new Date().getFullYear();
 renderStats();
+renderFooterPanel();
 renderChips();
 renderBooks();
 renderNotes();
+
+/* ============================================================
+ * 背景星空：灰白粒子缓慢漂移 + 闪烁，近距离粒子间连细线。
+ * 无外部依赖；requestAnimationFrame 驱动，标签页隐藏时暂停；
+ * prefers-reduced-motion 时降级为静态一帧。
+ * ============================================================ */
+(function starfield() {
+  const canvas = document.getElementById('starfield');
+  if (!canvas || !canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LINK_DIST = 110;          // 连线的最大距离（px）
+  let stars = [];
+  let raf = 0;
+  let running = false;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    /* 粒子数随面积自适应，上限 120，保证性能 */
+    const count = Math.min(120, Math.round(canvas.width * canvas.height / 14000));
+    stars = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: 0.4 + Math.random() * 1.2,               // 半径
+      vx: (Math.random() - 0.5) * 0.12,           // 漂移速度（很慢）
+      vy: (Math.random() - 0.5) * 0.12,
+      tw: Math.random() * Math.PI * 2,            // 闪烁相位
+      ts: 0.008 + Math.random() * 0.018           // 闪烁速度
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    /* 连线：低透明度灰白，越近越明显 */
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < stars.length; i++) {
+      for (let j = i + 1; j < stars.length; j++) {
+        const dx = stars[i].x - stars[j].x;
+        const dy = stars[i].y - stars[j].y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < LINK_DIST * LINK_DIST) {
+          ctx.strokeStyle = `rgba(255,255,255,${(0.055 * (1 - Math.sqrt(d2) / LINK_DIST)).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.moveTo(stars[i].x, stars[i].y);
+          ctx.lineTo(stars[j].x, stars[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    /* 星点：灰白小圆点，透明度随相位闪烁 */
+    for (const s of stars) {
+      ctx.fillStyle = `rgba(255,255,255,${(0.2 + 0.4 * (0.5 + 0.5 * Math.sin(s.tw))).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function loop() {
+    for (const s of stars) {
+      s.x += s.vx;
+      s.y += s.vy;
+      s.tw += s.ts;
+      /* 超出边界从对侧回绕 */
+      if (s.x < -5) s.x = canvas.width + 5;
+      else if (s.x > canvas.width + 5) s.x = -5;
+      if (s.y < -5) s.y = canvas.height + 5;
+      else if (s.y > canvas.height + 5) s.y = -5;
+    }
+    draw();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function start() {
+    if (reduceMotion) { draw(); return; }   // 降级：静态一帧
+    if (!running) { running = true; raf = requestAnimationFrame(loop); }
+  }
+  function stop() {
+    cancelAnimationFrame(raf);
+    running = false;
+  }
+
+  window.addEventListener('resize', () => { resize(); if (reduceMotion) draw(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop();
+    else start();
+  });
+
+  resize();
+  start();
+})();
 </script>
 
 </body>
