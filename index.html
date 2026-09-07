@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machoet · 个人资料库</title>
+<meta name="description" content="Machoet 的个人资料记录站：图形学、游戏开发、C++、算法等学习书籍与文档的收藏索引，方便随时查找。">
+<style>
+/* ============================================================
+   Machoet 个人资料库 —— 深夜书房主题
+   深色底 + 玻璃态卡片 + 暖琥珀灯光，纯 CSS，无外部依赖
+   ============================================================ */
+:root {
+  --bg-0: #0a0d14;            /* 最深的底色：墨蓝黑 */
+  --bg-1: #0e1320;
+  --ink: #e9e4d8;             /* 米白，像旧书纸页 */
+  --ink-dim: #9a93a8;
+  --ink-faint: #5d5870;
+  --amber: #e8b45f;           /* 主强调色：台灯琥珀 */
+  --amber-soft: rgba(232, 180, 95, 0.14);
+  --glass: rgba(22, 27, 41, 0.62);
+  --glass-border: rgba(233, 228, 216, 0.09);
+  --glass-hover: rgba(233, 228, 216, 0.2);
+  /* 分类色 */
+  --c-graphics: #6fd3c7;
+  --c-cpp: #7ea6f4;
+  --c-se: #e59aa8;
+  --c-algo: #b3e07f;
+  --c-note: #c9a2ec;
+  --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', SimSun, Georgia, serif;
+  --font-body: 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  --font-mono: 'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-0);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ---------- 背景氛围：渐变光斑 + 颗粒 ---------- */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 42% at 78% -6%, rgba(232, 180, 95, 0.13) 0%, transparent 65%),
+    radial-gradient(ellipse 48% 40% at 8% 24%, rgba(111, 211, 199, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 108%, rgba(126, 166, 244, 0.08) 0%, transparent 62%),
+    linear-gradient(175deg, var(--bg-1) 0%, var(--bg-0) 55%);
+}
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+/* 缓慢漂浮的光晕 */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  animation: drift 26s ease-in-out infinite alternate;
+}
+.orb-a { width: 420px; height: 420px; top: -140px; right: -100px; background: rgba(232, 180, 95, 0.10); }
+.orb-b { width: 360px; height: 360px; bottom: -120px; left: -120px; background: rgba(126, 166, 244, 0.09); animation-delay: -13s; }
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-50px, 46px) scale(1.15); }
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- 入场动画 ---------- */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rise { opacity: 0; animation: rise 0.7s cubic-bezier(0.22, 0.9, 0.3, 1) forwards; }
+
+/* ============================================================
+   头部 · 个人简介
+   ============================================================ */
+.hero {
+  padding: 88px 0 56px;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+.avatar {
+  flex-shrink: 0;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--bg-0);
+  background: linear-gradient(140deg, #f3d9a4 0%, var(--amber) 48%, #b97e2e 100%);
+  box-shadow:
+    0 0 0 1px rgba(232, 180, 95, 0.35),
+    0 0 0 9px rgba(232, 180, 95, 0.06),
+    0 18px 44px rgba(232, 180, 95, 0.18);
+  position: relative;
+}
+.avatar::after {           /* 呼吸光环 */
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 1px dashed rgba(232, 180, 95, 0.35);
+  animation: spin 40s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hero-text { flex: 1; min-width: 260px; }
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  color: var(--amber);
+  margin-bottom: 10px;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5vw, 3.1rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+.hero-title em {
+  font-style: normal;
+  background: linear-gradient(120deg, #f3d9a4, var(--amber));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-bio {
+  margin-top: 14px;
+  max-width: 560px;
+  color: var(--ink-dim);
+  font-size: 0.95rem;
+}
+.hero-links { margin-top: 22px; display: flex; gap: 12px; flex-wrap: wrap; }
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.social-link svg { width: 18px; height: 18px; }
+.social-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--glass-hover);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+.social-link.csdn:hover { border-color: rgba(252, 85, 49, 0.55); }
+.social-link.bili:hover { border-color: rgba(0, 174, 236, 0.55); }
+
+/* 统计条 */
+.hero-stats {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.stat {
+  flex: 1;
+  min-width: 130px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.stat b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  color: var(--amber);
+  line-height: 1.3;
+}
+.stat span { font-size: 0.78rem; color: var(--ink-faint); letter-spacing: 0.08em; }
+
+/* ============================================================
+   工具栏 · 搜索 + 分类筛选
+   ============================================================ */
+.toolbar {
+  margin: 40px 0 34px;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 14px;
+  z-index: 5;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+.search-wrap { position: relative; }
+.search-wrap svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 17px;
+  height: 17px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+#searchInput {
+  width: 100%;
+  padding: 12px 16px 12px 46px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: rgba(10, 13, 20, 0.55);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.94rem;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+#searchInput::placeholder { color: var(--ink-faint); }
+#searchInput:focus {
+  border-color: rgba(232, 180, 95, 0.5);
+  box-shadow: 0 0 0 3px rgba(232, 180, 95, 0.12);
+}
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--ink-dim);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.chip:hover { color: var(--ink); border-color: var(--glass-hover); }
+.chip.active {
+  background: var(--amber-soft);
+  border-color: rgba(232, 180, 95, 0.55);
+  color: var(--amber);
+}
+.chip .count { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.75; margin-left: 4px; }
+
+/* ============================================================
+   资料分区与卡片
+   ============================================================ */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 46px 0 20px;
+}
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.section-head .tally {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+.section-head::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--glass-border), transparent);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  text-decoration: none;
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.22, 0.9, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
+}
+.card::before {           /* 顶部分类色细线 */
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cat, var(--amber)), transparent 75%);
+  opacity: 0.65;
+}
+.card:hover {
+  transform: translateY(-5px);
+  border-color: var(--glass-hover);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45), 0 0 30px -12px var(--cat, var(--amber));
+}
+/* 书脊样式的图标块 */
+.card-spine {
+  flex-shrink: 0;
+  width: 46px;
+  height: 62px;
+  border-radius: 5px 9px 9px 5px;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--cat, var(--amber)) 30%, #1a2030), #131828);
+  border: 1px solid color-mix(in srgb, var(--cat, var(--amber)) 35%, transparent);
+  border-left: 4px solid var(--cat, var(--amber));
+  display: grid;
+  place-items: center;
+  color: var(--cat, var(--amber));
+  transition: transform 0.3s;
+}
+.card:hover .card-spine { transform: rotate(-4deg) translateY(-2px); }
+.card-spine svg { width: 20px; height: 20px; }
+
+.card-body { flex: 1; min-width: 0; }
+.card-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.45;
+  margin-bottom: 4px;
+  transition: color 0.25s;
+}
+.card:hover .card-title { color: var(--cat, var(--amber)); }
+.card-desc {
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+.card-meta .tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--cat, var(--amber)) 40%, transparent);
+  color: var(--cat, var(--amber));
+}
+.card-meta .open-hint {
+  margin-left: auto;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s, transform 0.25s;
+  color: var(--cat, var(--amber));
+}
+.card:hover .open-hint { opacity: 1; transform: translateX(0); }
+
+/* 空状态 */
+.empty {
+  padding: 52px 24px;
+  border-radius: 18px;
+  border: 1px dashed var(--glass-border);
+  background: rgba(22, 27, 41, 0.35);
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 0.9rem;
+}
+.empty .glyph { font-size: 2rem; display: block; margin-bottom: 10px; opacity: 0.7; }
+
+/* ============================================================
+   页脚
+   ============================================================ */
+footer {
+  margin-top: 90px;
+  padding: 34px 0 44px;
+  border-top: 1px solid var(--glass-border);
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+footer .mono { font-family: var(--font-mono); letter-spacing: 0.06em; }
+footer a { color: var(--ink-dim); text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
+footer a:hover { color: var(--amber); border-color: var(--amber); }
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width: 640px) {
+  .hero { padding: 56px 0 40px; gap: 24px; }
+  .avatar { width: 88px; height: 88px; font-size: 2.3rem; }
+  .toolbar { position: static; padding: 14px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .stat { min-width: calc(50% - 6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .rise { opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="backdrop" aria-hidden="true"></div>
+<div class="orb orb-a" aria-hidden="true"></div>
+<div class="orb orb-b" aria-hidden="true"></div>
+
+<div class="page">
+
+  <!-- ============ 头部 · 个人简介 ============ -->
+  <header class="hero">
+    <div class="avatar rise" style="animation-delay:.05s" aria-hidden="true">M</div>
+    <div class="hero-text">
+      <p class="hero-eyebrow rise" style="animation-delay:.1s">MACHOET · 资料库</p>
+      <h1 class="hero-title rise" style="animation-delay:.16s">深夜书房，<em>存我所学</em></h1>
+      <p class="hero-bio rise" style="animation-delay:.24s">
+        你好，我是 <strong>Machoet</strong>。这里是我的个人资料记录站，
+        收录图形学、游戏开发、C++ 与算法方向的学习书籍和文档，方便日后随时翻阅查找。
+      </p>
+      <nav class="hero-links rise" style="animation-delay:.32s" aria-label="社交链接">
+        <a class="social-link csdn" href="https://blog.csdn.net/weixin_56946623?spm=1000.2115.3001.5343" target="_blank" rel="noopener noreferrer">
+          <!-- CSDN：博客钢笔图标 -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fc5531" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9.2"/>
+            <path d="M15.5 8.6c-.9-.7-2.1-1.1-3.4-1.1-3 0-5.1 1.9-5.1 4.5s2.1 4.5 5.1 4.5c1.3 0 2.5-.4 3.4-1.1"/>
+          </svg>
+          CSDN 博客
+        </a>
+        <a class="social-link bili" href="https://space.bilibili.com/668352616?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer">
+          <!-- B站：小电视图标 -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00aeec" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="7" width="18" height="13" rx="3"/>
+            <path d="M7.5 3.5 10 6.8M16.5 3.5 14 6.8"/>
+            <path d="M8.5 11.5v3M15.5 11.5v3"/>
+          </svg>
+          B站主页
+        </a>
+      </nav>
+    </div>
+    <div class="hero-stats rise" style="animation-delay:.4s" id="heroStats"></div>
+  </header>
+
+  <main>
+    <!-- ============ 搜索与筛选 ============ -->
+    <section class="toolbar rise" style="animation-delay:.48s" aria-label="搜索与筛选">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>
+        </svg>
+        <input id="searchInput" type="search" placeholder="按书名搜索，例如「Vulkan」「设计模式」…" autocomplete="off" aria-label="搜索资料">
+      </div>
+      <div class="chips" id="chipBar" role="tablist" aria-label="分类筛选"></div>
+    </section>
+
+    <!-- ============ 书籍资料区（JS 渲染） ============ -->
+    <section id="bookArea" aria-label="书籍资料"></section>
+
+    <!-- ============ 笔记 / 文档扩展区（JS 渲染） ============ -->
+    <section aria-label="笔记与文档">
+      <div class="section-head rise" style="animation-delay:.55s">
+        <h2>📝 笔记 / 文档</h2>
+        <span class="tally" id="noteTally"></span>
+      </div>
+      <div id="noteArea"></div>
+    </section>
+  </main>
+
+  <!-- ============ 页脚 ============ -->
+  <footer>
+    <p>© <span id="year"></span> Machoet · 学而时习之</p>
+    <p class="mono" style="margin-top:6px">Powered by <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a></p>
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+ * 📚 资料数据（整个页面由这个数组驱动）
+ * ------------------------------------------------------------
+ * ★ 如何添加新资料 —— 只需在 RESOURCES 数组末尾加一条对象：
+ *
+ *   1. title    : 资料标题（显示在卡片上的名字）
+ *   2. category : 分类 key，必须是 CATEGORIES 里已有的 key
+ *                 （book 类：graphics / cpp / se / algo；
+ *                  笔记文档类：note）。建议先在 CATEGORIES
+ *                 中登记新分类（可自定义名称与颜色）；未登记
+ *                 的 key 也会渲染，只是直接用 key 当名称。
+ *   3. size     : 文件大小的展示文本，如 "317 MB"（纯链接可留 ""）
+ *   4. href     : 链接地址。仓库内文件写相对路径，中文/空格
+ *                 无需手动编码，渲染时会自动 encodeURI 处理；
+ *                 凡带协议前缀的链接（https:// / mailto: /
+ *                 tel: 等）会原样使用、不做编码。
+ *   5. type     : "pdf" | "note" | "link"，决定图标与所属分区
+ *                 （pdf 显示在书籍区，note/link 显示在笔记区）
+ *   6. desc     : 一句话简介（可为空字符串）
+ *
+ * ★ 示例（复制取消注释即可）：
+ * // {
+ * //   title: "渲染管线学习笔记",
+ * //   category: "note",
+ * //   size: "",
+ * //   href: "笔记/渲染管线.md",
+ * //   type: "note",
+ * //   desc: "从顶点到像素的流程整理"
+ * // },
+ * ============================================================ */
+
+const CATEGORIES = {
+  graphics: { name: '3D 图形学 & 游戏开发', color: 'var(--c-graphics)' },
+  cpp:      { name: 'C++ 编程',             color: 'var(--c-cpp)' },
+  se:       { name: '软件工程 & 引擎设计',   color: 'var(--c-se)' },
+  algo:     { name: '算法 & 数据结构',       color: 'var(--c-algo)' },
+  note:     { name: '笔记 / 文档',           color: 'var(--c-note)' }
+};
+
+const RESOURCES = [
+  /* ---- 3D 图形学 & 游戏开发 ---- */
+  { title: '3D数学基础',                     category: 'graphics', size: '317 MB', href: '资料/3D数学基础.pdf',                     type: 'pdf', desc: '图形与游戏开发的数学基石：向量、矩阵、变换' },
+  { title: 'dx12 3D游戏开发实战',            category: 'graphics', size: '246 MB', href: '资料/dx12 3D游戏开发实战.pdf',            type: 'pdf', desc: 'DirectX 12 渲染管线与游戏开发实战（龙书）' },
+  { title: 'OpenGL编程指南',                 category: 'graphics', size: '34 MB',  href: '资料/OpenGL编程指南.pdf',                 type: 'pdf', desc: 'OpenGL 官方权威指南（红宝书）' },
+  { title: 'Vulkan学习指南',                 category: 'graphics', size: '11 MB',  href: '资料/Vulkan学习指南.pdf',                 type: 'pdf', desc: '新一代显式图形 API 入门与实践' },
+  { title: '全局光照技术',                   category: 'graphics', size: '128 MB', href: '资料/全局光照技术.pdf',                   type: 'pdf', desc: '从离线到实时渲染的全局光照理论与实现' },
+  { title: '游戏编程模式',                   category: 'graphics', size: '38 MB',  href: '资料/游戏编程模式.pdf',                   type: 'pdf', desc: '游戏开发中常用的架构与设计模式' },
+
+  /* ---- C++ 编程 ---- */
+  { title: 'C++ Primer Plus',                category: 'cpp',      size: '301 MB', href: '资料/C++ Primer Plus.pdf',                type: 'pdf', desc: '经典 C++ 入门与进阶教程' },
+  { title: 'C++17 入门经典',                 category: 'cpp',      size: '192 MB', href: '资料/C++17 入门经典.pdf',                 type: 'pdf', desc: '基于 C++17 标准的系统学习教材' },
+  { title: 'C++20高级编程',                  category: 'cpp',      size: '142 MB', href: '资料/C++20高级编程.pdf',                  type: 'pdf', desc: 'C++20 新特性与高级编程技巧' },
+
+  /* ---- 软件工程 & 引擎设计 ---- */
+  { title: '大话设计模式C',                  category: 'se',       size: '2 MB',   href: '资料/大话设计模式C.pdf',                  type: 'pdf', desc: '以对话形式讲解常见设计模式' },
+  { title: '大象无形：虚幻引擎程序设计浅析', category: 'se',       size: '9 MB',   href: '资料/大象无形：虚幻引擎程序设计浅析.pdf', type: 'pdf', desc: 'Unreal Engine 架构与程序设计剖析' },
+
+  /* ---- 算法 & 数据结构 ---- */
+  { title: '数据结构与算法应用',             category: 'algo',     size: '216 MB', href: '资料/数据结构与算法应用.pdf',             type: 'pdf', desc: '数据结构与算法的原理及应用实践' }
+
+  /* ↑↑ 在此行上方追加新条目（记得给上一条末尾补逗号） ↑↑ */
+];
+
+/* ============================================================
+ * 以下为渲染逻辑，一般无需改动
+ * ============================================================ */
+const books = RESOURCES.filter(r => r.type === 'pdf');
+const notes = RESOURCES.filter(r => r.type !== 'pdf');
+
+let activeCategory = 'all';
+let keyword = '';
+
+const $ = sel => document.querySelector(sel);
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+/* 相对路径中的中文与空格做 URL 编码；带协议的链接（https:、mailto:、tel: 等）原样返回 */
+function encodeHref(href) {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href)) return href;
+  return href.split('/').map(encodeURIComponent).join('/');
+}
+
+const ICONS = {
+  pdf:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>'
+};
+
+function cardHTML(item, delay) {
+  const cat = catInfo(item.category);
+  const external = /^https?:\/\//i.test(item.href);
+  return `
+    <a class="card rise" style="--cat:${cat.color};animation-delay:${delay}s"
+       href="${escapeHtml(encodeHref(item.href))}" target="_blank" rel="noopener noreferrer"
+       title="打开：${escapeHtml(item.title)}">
+      <span class="card-spine">${ICONS[item.type] || ICONS.pdf}</span>
+      <span class="card-body">
+        <span class="card-title">${escapeHtml(item.title)}</span>
+        ${item.desc ? `<span class="card-desc">${escapeHtml(item.desc)}</span>` : ''}
+        <span class="card-meta">
+          <span class="tag">${escapeHtml(cat.name)}</span>
+          ${item.size ? `<span>${escapeHtml(item.size)}</span>` : ''}
+          <span class="open-hint">${external ? '访问 →' : '打开 →'}</span>
+        </span>
+      </span>
+    </a>`;
+}
+
+function emptyHTML(text) {
+  return `<div class="empty"><span class="glyph">🌙</span>${escapeHtml(text)}</div>`;
+}
+
+/* 分类信息（未在 CATEGORIES 登记的 key 用 fallback 名称/颜色兜底） */
+function catInfo(key) {
+  return CATEGORIES[key] || { name: key, color: 'var(--amber)' };
+}
+
+/* 书籍分类 key 列表：CATEGORIES 定义的顺序优先，
+   数据中出现但未登记的分类追加在后面，确保条目不会静默丢失 */
+function bookCategoryKeys() {
+  const keys = Object.keys(CATEGORIES).filter(k => k !== 'note');
+  for (const b of books) {
+    if (!keys.includes(b.category)) keys.push(b.category);
+  }
+  return keys;
+}
+
+/* ---- 渲染书籍区：按分类分组 ---- */
+function renderBooks() {
+  const kw = keyword.trim().toLowerCase();
+  const match = b =>
+    (activeCategory === 'all' || b.category === activeCategory) &&
+    (!kw || b.title.toLowerCase().includes(kw) || (b.desc || '').toLowerCase().includes(kw));
+
+  const visible = books.filter(match);
+  const area = $('#bookArea');
+
+  if (!visible.length) {
+    area.innerHTML = `
+      <div class="section-head"><h2>📚 书籍资料</h2><span class="tally">0 本</span></div>
+      ${emptyHTML('没有找到匹配的资料，换个关键词试试？')}`;
+    return;
+  }
+
+  let html = '';
+  let delay = 0;
+  for (const key of bookCategoryKeys()) {
+    const group = visible.filter(b => b.category === key);
+    if (!group.length) continue;
+    html += `
+      <div class="section-head">
+        <h2>${escapeHtml(catInfo(key).name)}</h2>
+        <span class="tally">${group.length} 本</span>
+      </div>
+      <div class="card-grid">
+        ${group.map(b => cardHTML(b, Math.min(delay += 0.05, 0.5))).join('')}
+      </div>`;
+  }
+  area.innerHTML = html;
+}
+
+/* ---- 渲染笔记 / 文档区 ---- */
+function renderNotes() {
+  $('#noteTally').textContent = notes.length ? `${notes.length} 篇` : '';
+  $('#noteArea').innerHTML = notes.length
+    ? `<div class="card-grid">${notes.map((n, i) => cardHTML(n, 0.1 + i * 0.05)).join('')}</div>`
+    : emptyHTML('暂无笔记，敬请期待 —— 在页面源码的 RESOURCES 数组中添加 type 为 "note" 或 "link" 的条目即可。');
+}
+
+/* ---- 分类筛选按钮 ---- */
+function renderChips() {
+  const chips = [{ key: 'all', name: '全部', count: books.length }]
+    .concat(bookCategoryKeys()
+      .map(k => ({ key: k, name: catInfo(k).name, count: books.filter(b => b.category === k).length })));
+
+  $('#chipBar').innerHTML = chips.map(c => `
+    <button class="chip${c.key === activeCategory ? ' active' : ''}" data-cat="${escapeHtml(c.key)}"
+            role="tab" aria-selected="${c.key === activeCategory}">
+      ${escapeHtml(c.name)}<span class="count">${c.count}</span>
+    </button>`).join('');
+}
+
+/* ---- 顶部统计 ---- */
+/* 解析 "317 MB" 这类 size 文本为 MB 数值，无法解析按 0 处理 */
+function parseSizeMB(size) {
+  const m = /([\d.]+)\s*(GB|MB|KB)/i.exec(size || '');
+  if (!m) return 0;
+  const mul = { KB: 1 / 1024, MB: 1, GB: 1024 }[m[2].toUpperCase()];
+  return parseFloat(m[1]) * mul;
+}
+
+function formatTotalSize(mb) {
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${Math.round(mb)} MB`;
+}
+
+function renderStats() {
+  const totalMB = RESOURCES.reduce((sum, r) => sum + parseSizeMB(r.size), 0);
+  $('#heroStats').innerHTML = `
+    <div class="stat"><b>${books.length}</b><span>册藏书</span></div>
+    <div class="stat"><b>${bookCategoryKeys().length}</b><span>个分类</span></div>
+    <div class="stat"><b>${formatTotalSize(totalMB)}</b><span>资料体积</span></div>
+    <div class="stat"><b>${notes.length || '···'}</b><span>笔记文档</span></div>`;
+}
+
+/* ---- 事件绑定 ---- */
+$('#chipBar').addEventListener('click', e => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  activeCategory = btn.dataset.cat;
+  renderChips();
+  renderBooks();
+});
+
+$('#searchInput').addEventListener('input', e => {
+  keyword = e.target.value;
+  renderBooks();
+});
+
+/* ---- 初始渲染 ---- */
+$('#year').textContent = new Date().getFullYear();
+renderStats();
+renderChips();
+renderBooks();
+renderNotes();
+</script>
+
+</body>
+</html>
