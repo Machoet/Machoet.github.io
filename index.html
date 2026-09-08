@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Machoet · 资料库</title>
-<meta name="description" content="Machoet 的个人资料库，收录图形学、游戏开发、C++、算法等学习书籍与文档。">
+<meta name="description" content="自用资料存档，书籍与文档备查。">
 <style>
 /* ============================================================
    Machoet —— 深色开发者主题
@@ -644,7 +644,7 @@ footer .footer-links a { border-bottom: none; }
     </div>
     <h1 class="hero-title rise" style="animation-delay:.2s">Machoet</h1>
     <p class="hero-bio rise" style="animation-delay:.28s">
-      这里是我的个人资料库，收录学习书籍与文档，方便日后查找。
+      记录个人C++、UE有关的学习资料
     </p>
     <div class="hero-stats rise" style="animation-delay:.38s" id="heroStats"></div>
   </header>
@@ -722,6 +722,11 @@ footer .footer-links a { border-bottom: none; }
  *                 无需手动编码，渲染时会自动 encodeURI 处理；
  *                 凡带协议前缀的链接（https:// / mailto: /
  *                 tel: 等）会原样使用、不做编码。
+ *                 注意："资料/" 目录内的文件走 Git LFS 存储，
+ *                 GitHub Pages 不支持 LFS 文件直出（相对链接只会
+ *                 返回 LFS 指针文本），渲染时会自动改写为 LFS
+ *                 媒体直链（media.githubusercontent.com），照常
+ *                 写相对路径即可。
  *   5. type     : "pdf" | "note" | "link"，决定图标与所属分区
  *                 （pdf 显示在书籍区，note/link 显示在笔记区）
  *   6. desc     : 一句话简介（可为空字符串）
@@ -786,10 +791,17 @@ function escapeHtml(s) {
   }[c]));
 }
 
-/* 相对路径中的中文与空格做 URL 编码；带协议的链接（https:、mailto:、tel: 等）原样返回 */
+/* Git LFS 媒体直链前缀：GitHub Pages 不解析 LFS，"资料/" 内的 PDF 若用相对链接
+   只会返回 133 字节的 LFS 指针文本；改走 media.githubusercontent.com 可取到真实文件 */
+const LFS_MEDIA_BASE = 'https://media.githubusercontent.com/media/Machoet/Machoet.github.io/main/';
+
+/* 相对路径中的中文与空格做 URL 编码；带协议的链接（https:、mailto:、tel: 等）原样返回。
+   "资料/" 开头的相对路径编码后再拼上 LFS 媒体直链前缀（原因见上），其余相对路径行为不变 */
 function encodeHref(href) {
   if (/^[a-z][a-z0-9+.-]*:/i.test(href)) return href;
-  return href.split('/').map(encodeURIComponent).join('/');
+  const encoded = href.split('/').map(encodeURIComponent).join('/');
+  if (href.startsWith('资料/')) return LFS_MEDIA_BASE + encoded;
+  return encoded;
 }
 
 const ICONS = {
