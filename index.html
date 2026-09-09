@@ -7,34 +7,38 @@
 <meta name="description" content="自用资料存档，书籍与文档备查。">
 <style>
 /* ============================================================
-   Machoet —— 深色开发者主题
-   近黑背景 + 玻璃态卡片，GitHub 绿点缀 + VS Code Dark+ 分类色板
+   Machoet —— 深空科幻 HUD 主题
+   深空底色 + 玻璃态面板，霓虹青强调 + 科幻系分类色板
    纯 CSS，无外部依赖
    ============================================================ */
 :root {
-  --bg-0: #0d0d0d;            /* 最深的底色：近黑 */
-  --bg-1: #141414;
-  --ink: #e6edf3;             /* 主文字：灰白 */
-  --ink-dim: #9198a1;
-  --ink-faint: #59616b;
-  --accent: #56d364;          /* 主强调色：GitHub 绿（亮） */
-  --accent-dim: #3fb950;      /* GitHub 绿（暗，用于边框） */
-  --accent-soft: rgba(63, 185, 80, 0.12);
-  --glass: rgba(22, 24, 26, 0.62);
-  --glass-border: rgba(240, 246, 252, 0.09);
-  --glass-hover: rgba(240, 246, 252, 0.22);
-  /* 分类色：VS Code Dark+ 低饱和色板 */
-  --c-graphics: #4ec9b0;      /* 青绿（类型色） */
-  --c-cpp: #569cd6;           /* 蓝（关键字色） */
-  --c-se: #c586c0;            /* 紫（控制流色） */
-  --c-algo: #ce9178;          /* 橙（字符串色） */
-  --c-note: #dcdcaa;          /* 黄（函数名色） */
+  --bg-0: #05070d;            /* 最深的底色：深空黑 */
+  --bg-1: #0a1120;
+  --ink: #dbe7f4;             /* 主文字：冷灰白 */
+  --ink-dim: #8b9bb2;
+  --ink-faint: #55627a;
+  --accent: #38e1ff;          /* 主强调色：霓虹青（亮） */
+  --accent-dim: #22d3ee;      /* 霓虹青（暗，用于边框） */
+  --accent-soft: rgba(34, 211, 238, 0.1);
+  --accent-glow: rgba(56, 225, 255, 0.45);   /* 强调色辉光（边框 hover 态） */
+  --electric: #4f8dff;        /* 辅助色：电光蓝 */
+  --glass: rgba(11, 18, 32, 0.6);
+  --glass-border: rgba(148, 210, 255, 0.1);
+  --glass-hover: rgba(148, 210, 255, 0.28);
+  /* 分类色：科幻系低饱和霓虹色板 */
+  --c-graphics: #3ee6c4;      /* 青绿 */
+  --c-cpp: #66b3ff;           /* 冰蓝 */
+  --c-se: #b78cff;            /* 紫罗兰 */
+  --c-algo: #ffb454;          /* 琥珀橙 */
+  --c-note: #8be9fd;          /* 浅青 */
   --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', SimSun, Georgia, serif;
   --font-body: 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
   --font-mono: 'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
+::selection { background: rgba(56, 225, 255, 0.25); color: var(--ink); }
 
 html { scroll-behavior: smooth; }
 
@@ -54,10 +58,22 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 42% at 78% -6%, rgba(63, 185, 80, 0.05) 0%, transparent 65%),
-    radial-gradient(ellipse 48% 40% at 8% 24%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 108%, rgba(86, 156, 214, 0.04) 0%, transparent 62%),
+    radial-gradient(ellipse 55% 42% at 78% -6%, rgba(56, 225, 255, 0.055) 0%, transparent 65%),
+    radial-gradient(ellipse 48% 40% at 8% 24%, rgba(79, 141, 255, 0.045) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 108%, rgba(183, 140, 255, 0.04) 0%, transparent 62%),
     linear-gradient(175deg, var(--bg-1) 0%, var(--bg-0) 55%);
+}
+/* 全息网格：极低对比的青色网格线，中心区域渐隐，仅作背景细节 */
+.backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(56, 225, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 225, 255, 0.022) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 90% 75% at 50% 20%, #000 0%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 75% at 50% 20%, #000 0%, transparent 100%);
 }
 .backdrop::after {
   content: '';
@@ -66,7 +82,7 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 }
 
-/* 背景星空画布（灰白粒子，JS 绘制） */
+/* 背景星空画布（青白粒子，JS 绘制） */
 #starfield {
   position: fixed;
   inset: 0;
@@ -84,8 +100,8 @@ body {
   opacity: 0.5;
   animation: drift 26s ease-in-out infinite alternate;
 }
-.orb-a { width: 420px; height: 420px; top: -140px; right: -100px; background: rgba(63, 185, 80, 0.05); }
-.orb-b { width: 360px; height: 360px; bottom: -120px; left: -120px; background: rgba(255, 255, 255, 0.04); animation-delay: -13s; }
+.orb-a { width: 420px; height: 420px; top: -140px; right: -100px; background: rgba(56, 225, 255, 0.05); }
+.orb-b { width: 360px; height: 360px; bottom: -120px; left: -120px; background: rgba(79, 141, 255, 0.045); animation-delay: -13s; }
 @keyframes drift {
   from { transform: translate(0, 0) scale(1); }
   to   { transform: translate(-50px, 46px) scale(1.15); }
@@ -113,10 +129,11 @@ body {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(13, 13, 13, 0.72);
+  background: rgba(5, 7, 13, 0.72);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 rgba(56, 225, 255, 0.05), 0 8px 30px -18px rgba(56, 225, 255, 0.25);
 }
 .topnav-inner {
   max-width: 1200px;
@@ -166,7 +183,7 @@ body {
   color: var(--ink-dim);
   transition: color 0.2s, border-color 0.2s;
 }
-.nav-icons a:hover { color: var(--accent); border-color: rgba(63, 185, 80, 0.45); }
+.nav-icons a:hover { color: var(--accent); border-color: var(--accent-glow); box-shadow: 0 0 12px -4px var(--accent-glow); }
 .nav-icons svg { width: 16px; height: 16px; }
 
 /* ============================================================
@@ -188,10 +205,10 @@ body {
   height: 112px;
   margin: 28px 0 24px;
   border-radius: 50%;
-  background: #1a1a1a;
+  background: #0b1220;
   box-shadow:
-    0 0 0 1px rgba(240, 246, 252, 0.18),
-    0 0 0 9px rgba(63, 185, 80, 0.05),
+    0 0 0 1px rgba(190, 225, 255, 0.2),
+    0 0 0 9px rgba(56, 225, 255, 0.06),
     0 18px 44px rgba(0, 0, 0, 0.5);
   position: relative;
 }
@@ -213,30 +230,45 @@ body {
   font-size: 3rem;
   font-weight: 700;
   color: var(--bg-0);
-  background: linear-gradient(140deg, #f2f2f2 0%, #c4c4c4 48%, #7d7d7d 100%);
+  background: linear-gradient(140deg, #eaf6ff 0%, #9fc4e0 48%, #5c7a99 100%);
 }
 .avatar::after {           /* 外圈虚线装饰 */
   content: '';
   position: absolute;
   inset: -9px;
   border-radius: 50%;
-  border: 1px dashed rgba(63, 185, 80, 0.35);
+  border: 1px dashed rgba(56, 225, 255, 0.35);
   animation: spin 40s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* HUD 标签样式：矩形边框 + 对角角标 */
 .hero-eyebrow {
+  position: relative;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.28em;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
   color: var(--accent);
+  padding: 6px 12px 6px 17px;   /* 右侧收窄以抵消末字符字距 */
+  border: 1px solid rgba(56, 225, 255, 0.3);
+  background: rgba(56, 225, 255, 0.05);
 }
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--accent);
+}
+.hero-eyebrow::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.hero-eyebrow::after  { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 .hero-title {
   font-family: var(--font-display);
   font-size: clamp(2.4rem, 6vw, 3.8rem);
   font-weight: 700;
   line-height: 1.2;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
 }
 .hero-bio {
   margin-top: 16px;
@@ -262,8 +294,8 @@ body {
 .social-link:hover {
   transform: translateY(-2px);
   color: var(--accent);
-  border-color: rgba(63, 185, 80, 0.45);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+  border-color: var(--accent-glow);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4), 0 0 18px -6px var(--accent-glow);
 }
 
 /* 统计条 */
@@ -312,7 +344,7 @@ body {
   font-family: var(--font-display);
   font-size: 1.7rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
 }
 .block-head .tally {
   margin-left: auto;
@@ -341,7 +373,10 @@ body {
   position: sticky;
   top: 74px;                    /* 避开顶部导航栏 */
   z-index: 5;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.35),
+    0 0 28px -18px var(--accent-glow),
+    inset 0 1px 0 rgba(148, 210, 255, 0.07);
 }
 .search-wrap { position: relative; }
 .search-wrap svg {
@@ -359,7 +394,7 @@ body {
   padding: 12px 16px 12px 46px;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
-  background: rgba(10, 10, 10, 0.55);
+  background: rgba(4, 8, 16, 0.6);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 0.94rem;
@@ -368,8 +403,8 @@ body {
 }
 #searchInput::placeholder { color: var(--ink-faint); }
 #searchInput:focus {
-  border-color: rgba(63, 185, 80, 0.55);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: rgba(56, 225, 255, 0.55);
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 16px -6px var(--accent-glow);
 }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .chip {
@@ -386,8 +421,9 @@ body {
 .chip:hover { color: var(--ink); border-color: var(--glass-hover); }
 .chip.active {
   background: var(--accent-soft);
-  border-color: rgba(63, 185, 80, 0.55);
+  border-color: rgba(56, 225, 255, 0.55);
   color: var(--accent);
+  box-shadow: 0 0 12px -5px var(--accent-glow);
 }
 .chip .count { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.75; margin-left: 4px; }
 
@@ -404,7 +440,7 @@ body {
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
 }
 .section-head .tally {
   font-family: var(--font-mono);
@@ -437,6 +473,7 @@ body {
   color: var(--ink);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 20px -16px var(--cat, var(--accent));
   transition: transform 0.3s cubic-bezier(0.22, 0.9, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
 }
 .card::before {           /* 顶部分类色细线 */
@@ -449,8 +486,8 @@ body {
 }
 .card:hover {
   transform: translateY(-5px);
-  border-color: var(--glass-hover);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45), 0 0 30px -12px var(--cat, var(--accent));
+  border-color: color-mix(in srgb, var(--cat, var(--accent)) 45%, transparent);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45), 0 0 34px -10px var(--cat, var(--accent));
 }
 /* 书脊样式的图标块 */
 .card-spine {
@@ -458,7 +495,7 @@ body {
   width: 46px;
   height: 62px;
   border-radius: 5px 9px 9px 5px;
-  background: linear-gradient(155deg, color-mix(in srgb, var(--cat, var(--accent)) 22%, #1c1c1c), #151515);
+  background: linear-gradient(155deg, color-mix(in srgb, var(--cat, var(--accent)) 22%, #0d1626), #0a101d);
   border: 1px solid color-mix(in srgb, var(--cat, var(--accent)) 35%, transparent);
   border-left: 4px solid var(--cat, var(--accent));
   display: grid;
@@ -515,7 +552,7 @@ body {
   padding: 52px 24px;
   border-radius: 18px;
   border: 1px dashed var(--glass-border);
-  background: rgba(24, 24, 24, 0.35);
+  background: rgba(11, 18, 32, 0.32);
   text-align: center;
   color: var(--ink-faint);
   font-size: 0.9rem;
@@ -551,19 +588,20 @@ footer {
   align-items: flex-end;
   gap: 14px;
 }
-/* 终端风格概况面板 */
+/* 终端风格概况面板（HUD 边框 + 微辉光） */
 .footer-panel {
   font-family: var(--font-mono);
   font-size: 0.74rem;
   line-height: 1.9;
   padding: 14px 20px;
   border-radius: 12px;
-  border: 1px solid var(--glass-border);
-  background: rgba(24, 24, 24, 0.5);
+  border: 1px solid rgba(56, 225, 255, 0.16);
+  background: rgba(8, 13, 24, 0.55);
   color: var(--ink-dim);
   white-space: pre;
   text-align: left;
   min-width: 220px;
+  box-shadow: 0 0 24px -14px var(--accent-glow), inset 0 1px 0 rgba(148, 210, 255, 0.06);
 }
 .footer-panel .p { color: var(--accent); }
 .footer-panel .k { color: var(--ink-faint); }
@@ -620,9 +658,9 @@ footer .footer-links a { border-bottom: none; }
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
-.card-status--ongoing { color: var(--accent); border: 1px solid rgba(63, 185, 80, 0.5); background: var(--accent-soft); }
-.card-status--done    { color: var(--ink); border: 1px solid var(--glass-hover); background: rgba(240, 246, 252, 0.07); }
-.card-status--exp     { color: var(--ink-faint); border: 1px dashed rgba(240, 246, 252, 0.18); }
+.card-status--ongoing { color: var(--accent); border: 1px solid rgba(56, 225, 255, 0.5); background: var(--accent-soft); }
+.card-status--done    { color: var(--ink); border: 1px solid var(--glass-hover); background: rgba(190, 225, 255, 0.08); }
+.card-status--exp     { color: var(--ink-faint); border: 1px dashed rgba(148, 210, 255, 0.22); }
 
 /* 技术栈标签行 */
 .card-tags {
@@ -666,7 +704,8 @@ footer .footer-links a { border-bottom: none; }
 }
 .skill-tag:hover {
   color: var(--accent);
-  border-color: rgba(63, 185, 80, 0.45);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 14px -6px var(--accent-glow);
   transform: translateY(-2px);
 }
 
@@ -674,7 +713,7 @@ footer .footer-links a { border-bottom: none; }
 .empty--dashed {
   padding: 38px 24px;
   background: transparent;
-  border-color: rgba(240, 246, 252, 0.13);
+  border-color: rgba(148, 210, 255, 0.16);
   font-family: var(--font-mono);
   font-size: 0.82rem;
   letter-spacing: 0.02em;
@@ -821,14 +860,14 @@ footer .footer-links a { border-bottom: none; }
 /* ============================================================
  * 资料数据（整个页面由这个数组驱动）
  * ------------------------------------------------------------
- * ★ 如何添加新资料 —— 只需在 RESOURCES 数组末尾加一条对象：
+ * 新增资料条目：在 RESOURCES 数组末尾追加一条对象，字段说明：
  *
  *   1. title    : 资料标题（显示在卡片上的名字）
- *   2. category : 分类 key，必须是 CATEGORIES 里已有的 key
+ *   2. category : 分类 key，须为 CATEGORIES 中已有的 key
  *                 （book 类：graphics / cpp / se / algo；
- *                  笔记文档类：note）。建议先在 CATEGORIES
- *                 中登记新分类（可自定义名称与颜色）；未登记
- *                 的 key 也会渲染，只是直接用 key 当名称。
+ *                  笔记文档类：note）。新分类应先在 CATEGORIES
+ *                 中登记（名称与颜色可自定义）；未登记的 key
+ *                 也会渲染，仅直接以 key 作为分类名称。
  *   3. size     : 文件大小的展示文本，如 "317 MB"（纯链接可留 ""）
  *   4. href     : 链接地址。仓库内文件写相对路径，中文/空格
  *                 无需手动编码，渲染时会自动 encodeURI 处理；
@@ -843,7 +882,7 @@ footer .footer-links a { border-bottom: none; }
  *                 （pdf 显示在书籍区，note/link 显示在笔记区）
  *   6. desc     : 一句话简介（可为空字符串）
  *
- * ★ 示例（复制取消注释即可）：
+ * 示例条目（使用时取消注释）：
  * // {
  * //   title: "渲染管线学习笔记",
  * //   category: "note",
@@ -853,8 +892,8 @@ footer .footer-links a { border-bottom: none; }
  * //   desc: "从顶点到像素的流程整理"
  * // },
  *
- * ★ 数据量增长到几十条以上时，可将本数组迁移为外置 JSON
- *   （fetch('./data/xxx.json') 加载后再渲染），当前体量无需。
+ * 数据量增长到几十条以上时，可将本数组迁移为外置 JSON
+ *   （fetch('./data/xxx.json') 加载后再渲染），当前体量无需迁移。
  * ============================================================ */
 
 const CATEGORIES = {
@@ -886,13 +925,13 @@ const RESOURCES = [
   /* ---- 算法 & 数据结构 ---- */
   { title: '数据结构与算法应用',             category: 'algo',     size: '216 MB', href: '资料/数据结构与算法应用.pdf',             type: 'pdf', desc: '数据结构与算法的原理及应用实践' }
 
-  /* ↑↑ 在此行上方追加新条目（记得给上一条末尾补逗号） ↑↑ */
+  /* 新条目追加位置：置于此行上方，并为上一条末尾补充逗号 */
 ];
 
 /* ============================================================
  * 项目数据（「项目 / 实验」板块由此数组驱动）
  * ------------------------------------------------------------
- * ★ 如何添加新项目 —— 在 PROJECTS 数组末尾加一条对象：
+ * 新增项目条目：在 PROJECTS 数组末尾追加一条对象，字段说明：
  *
  *   1. title  : 项目名称（显示在卡片上的名字）
  *   2. status : 状态徽标，只能是 '进行中' | '已完成' | '实验性'
@@ -903,7 +942,7 @@ const RESOURCES = [
  *   5. href   : GitHub 仓库或在线演示链接；留空字符串 ''
  *               则卡片仅作展示、不可点击
  *
- * ★ 示例（复制取消注释即可）：
+ * 示例条目（使用时取消注释）：
  * // {
  * //   title: 'UE5 载具手感 Demo',
  * //   status: '实验性',
@@ -919,12 +958,12 @@ const PROJECTS = [
 /* ============================================================
  * 技能数据（「技能档案」板块由此数组驱动）
  * ------------------------------------------------------------
- * ★ 如何添加技能 —— 在 SKILLS 数组末尾加一条对象：
+ * 新增技能分组：在 SKILLS 数组末尾追加一条对象，字段说明：
  *
  *   1. group : 技能分组名，如 'C++ / 引擎'、'图形 API'
  *   2. items : 该分组下的技能名字符串数组，渲染为标签云
  *
- * ★ 示例（复制取消注释即可）：
+ * 示例条目（使用时取消注释）：
  * // { group: 'C++ / 引擎', items: ['C++17', 'UE5', '渲染管线'] },
  * ============================================================ */
 const SKILLS = [
@@ -932,7 +971,7 @@ const SKILLS = [
 ];
 
 /* ============================================================
- * 以下为渲染逻辑，一般无需改动
+ * 以下为渲染逻辑
  * ============================================================ */
 const books = RESOURCES.filter(r => r.type === 'pdf');
 const notes = RESOURCES.filter(r => r.type !== 'pdf');
@@ -1183,7 +1222,7 @@ renderSkills();
 startFooterClock();
 
 /* ============================================================
- * 背景星空：灰白粒子缓慢漂移 + 闪烁，近距离粒子间连细线。
+ * 背景星空：青白色粒子缓慢漂移 + 闪烁，近距离粒子间连细线。
  * 无外部依赖；requestAnimationFrame 驱动，标签页隐藏时暂停；
  * prefers-reduced-motion 时降级为静态一帧。
  * ============================================================ */
@@ -1215,7 +1254,7 @@ startFooterClock();
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    /* 连线：低透明度灰白，越近越明显 */
+    /* 连线：低透明度青白，越近越明显 */
     ctx.lineWidth = 0.5;
     for (let i = 0; i < stars.length; i++) {
       for (let j = i + 1; j < stars.length; j++) {
@@ -1223,7 +1262,7 @@ startFooterClock();
         const dy = stars[i].y - stars[j].y;
         const d2 = dx * dx + dy * dy;
         if (d2 < LINK_DIST * LINK_DIST) {
-          ctx.strokeStyle = `rgba(255,255,255,${(0.055 * (1 - Math.sqrt(d2) / LINK_DIST)).toFixed(3)})`;
+          ctx.strokeStyle = `rgba(170,225,255,${(0.06 * (1 - Math.sqrt(d2) / LINK_DIST)).toFixed(3)})`;
           ctx.beginPath();
           ctx.moveTo(stars[i].x, stars[i].y);
           ctx.lineTo(stars[j].x, stars[j].y);
@@ -1231,9 +1270,9 @@ startFooterClock();
         }
       }
     }
-    /* 星点：灰白小圆点，透明度随相位闪烁 */
+    /* 星点：青白小圆点，透明度随相位闪烁 */
     for (const s of stars) {
-      ctx.fillStyle = `rgba(255,255,255,${(0.2 + 0.4 * (0.5 + 0.5 * Math.sin(s.tw))).toFixed(3)})`;
+      ctx.fillStyle = `rgba(205,240,255,${(0.2 + 0.4 * (0.5 + 0.5 * Math.sin(s.tw))).toFixed(3)})`;
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
