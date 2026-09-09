@@ -725,6 +725,101 @@ footer .footer-links a { border-bottom: none; }
   color: var(--ink-faint);
   letter-spacing: 0.08em;
 }
+
+/* ============================================================
+   Hash 路由视图（追加样式，不改动既有选择器）
+   ============================================================ */
+/* 视图容器：同一时间仅显示带 .active 的视图。display 切换同时承担
+   入场动画的重播机制——.rise 动画在 display:none 期间不执行，
+   视图重新显示时自动从头播放，无需逐元素操作 class */
+.view { display: none; }
+.view.active { display: block; }
+
+/* 导航当前项高亮：青色文字 + 底部辉光下划线 */
+.nav-links a.active {
+  position: relative;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.nav-links a.active::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: 3px;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* 首页板块入口卡片：延续玻璃态 HUD 卡片体系 */
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+.entry-card {
+  position: relative;
+  display: block;
+  padding: 24px 22px 20px;
+  border-radius: 18px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  text-decoration: none;
+  color: var(--ink);
+  overflow: hidden;
+  box-shadow: 0 0 20px -16px var(--accent);
+  transition: transform 0.3s cubic-bezier(0.22, 0.9, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
+}
+.entry-card::before {           /* 顶部强调色细线，与 .card 视觉语言一致 */
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent 75%);
+  opacity: 0.55;
+}
+.entry-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-glow);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45), 0 0 30px -10px var(--accent-glow);
+}
+.entry-card-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: color 0.25s;
+}
+.entry-card:hover .entry-card-name { color: var(--accent); }
+.entry-card-desc {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+}
+.entry-card-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent);
+}
+.entry-card .entry-arrow {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+.entry-card:hover .entry-arrow { opacity: 1; transform: translateX(0); }
+
+@media (max-width: 640px) {
+  .entry-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -737,11 +832,11 @@ footer .footer-links a { border-bottom: none; }
 <!-- ============ 顶部导航栏 ============ -->
 <header class="topnav">
   <div class="topnav-inner">
-    <a class="brand" href="#top">Machoet</a>
-    <nav class="nav-links" aria-label="页内导航">
-      <a href="#top">首页</a>
+    <a class="brand" href="#home">Machoet</a>
+    <nav class="nav-links" aria-label="视图导航">
+      <a href="#home">首页</a>
       <a href="#projects">项目</a>
-      <a href="#books">资料库</a>
+      <a href="#library">资料库</a>
       <a href="#notes">笔记</a>
       <a href="#skills">技能</a>
     </nav>
@@ -765,7 +860,9 @@ footer .footer-links a { border-bottom: none; }
 
 <div class="page">
 
-  <!-- ============ Hero · 个人简介 ============ -->
+  <!-- ============ 首页视图：Hero + 板块入口 ============ -->
+  <div class="view active" data-view="home">
+
   <header class="hero" id="top">
     <p class="hero-eyebrow rise" style="animation-delay:.05s">MACHOET.GITHUB.IO</p>
     <div class="avatar rise" style="animation-delay:.12s">
@@ -780,9 +877,20 @@ footer .footer-links a { border-bottom: none; }
     <div class="hero-stats rise" style="animation-delay:.38s" id="heroStats"></div>
   </header>
 
+  <!-- 板块快捷入口（卡片由 renderHomeEntries 渲染） -->
+  <section class="block" aria-label="板块入口">
+    <div class="block-head rise" style="animation-delay:.46s">
+      <h2>板块入口</h2>
+      <span class="rule"></span>
+    </div>
+    <div class="entry-grid" id="homeEntries"></div>
+  </section>
+
+  </div>
+
   <main>
-    <!-- ============ 项目 / 实验板块 ============ -->
-    <section id="projects" class="block" aria-label="项目与实验">
+    <!-- ============ 项目 / 实验板块（#projects 视图） ============ -->
+    <section class="block view" data-view="projects" aria-label="项目与实验">
       <div class="block-head rise" style="animation-delay:.42s">
         <h2>项目 / 实验</h2>
         <span class="rule"></span>
@@ -791,8 +899,8 @@ footer .footer-links a { border-bottom: none; }
       <div id="projectArea"></div>
     </section>
 
-    <!-- ============ 书籍资料库板块 ============ -->
-    <section id="books" class="block" aria-label="书籍资料库">
+    <!-- ============ 书籍资料库板块（#library 视图） ============ -->
+    <section class="block view" data-view="library" aria-label="书籍资料库">
       <div class="block-head rise" style="animation-delay:.46s">
         <h2>书籍资料库</h2>
         <span class="rule"></span>
@@ -812,8 +920,8 @@ footer .footer-links a { border-bottom: none; }
       <div id="bookArea"></div>
     </section>
 
-    <!-- ============ 笔记 / 文档板块 ============ -->
-    <section id="notes" class="block" aria-label="笔记与文档">
+    <!-- ============ 笔记 / 文档板块（#notes 视图） ============ -->
+    <section class="block view" data-view="notes" aria-label="笔记与文档">
       <div class="block-head rise" style="animation-delay:.55s">
         <h2>笔记 / 文档</h2>
         <span class="rule"></span>
@@ -822,8 +930,8 @@ footer .footer-links a { border-bottom: none; }
       <div id="noteArea"></div>
     </section>
 
-    <!-- ============ 技能档案板块 ============ -->
-    <section id="skills" class="block" aria-label="技能档案">
+    <!-- ============ 技能档案板块（#skills 视图） ============ -->
+    <section class="block view" data-view="skills" aria-label="技能档案">
       <div class="block-head rise" style="animation-delay:.6s">
         <h2>技能档案</h2>
         <span class="rule"></span>
@@ -947,7 +1055,7 @@ const RESOURCES = [
  * //   title: 'UE5 载具手感 Demo',
  * //   status: '实验性',
  * //   tech: ['UE5', 'C++', 'Chaos Vehicle'],
- * //   desc: '基于 Chaos 物理的载具操控手感调试小样',
+ * //   desc: '基于 Chaos 物理的载具操控调试示例',
  * //   href: 'https://github.com/Machoet/vehicle-demo'
  * // },
  * ============================================================ */
@@ -1191,6 +1299,76 @@ function startFooterClock() {
   setInterval(tick, 1000);
 }
 
+/* ---- 渲染首页板块入口卡片（计数复用既有数据源，不另设状态） ---- */
+function renderHomeEntries() {
+  const entries = [
+    { view: 'projects', name: '项目 / 实验', desc: '个人项目与实验性尝试', count: `${PROJECTS.length} 个项目` },
+    { view: 'library',  name: '书籍资料库', desc: '按分类整理的藏书，支持搜索与筛选', count: `${books.length} 本藏书` },
+    { view: 'notes',    name: '笔记 / 文档', desc: '学习笔记与文档链接归档', count: `${notes.length} 篇笔记` },
+    { view: 'skills',   name: '技能档案',   desc: '按分组归档的技能标签云', count: `${SKILLS.length} 个分组` }
+  ];
+  /* 入口卡片为普通锚链接，点击后由 hashchange 监听完成视图切换 */
+  $('#homeEntries').innerHTML = entries.map((e, i) => `
+    <a class="entry-card rise" style="animation-delay:${(0.5 + i * 0.06).toFixed(2)}s" href="#${e.view}">
+      <span class="entry-card-name">${escapeHtml(e.name)}</span>
+      <span class="entry-card-desc">${escapeHtml(e.desc)}</span>
+      <span class="entry-card-count">${escapeHtml(e.count)}<span class="entry-arrow">进入 →</span></span>
+    </a>`).join('');
+}
+
+/* ============================================================
+ * Hash 路由：单文件视图切换
+ * ------------------------------------------------------------
+ * 视图容器以 data-view 属性标识，同一时间仅一个视图持有 .active。
+ * location.hash 为唯一路由来源；未知或空 hash 回落 home。
+ * 视图显隐由 CSS 的 display 切换实现；.rise 入场动画在
+ * display:none 期间不执行，视图重新显示时浏览器自动从头
+ * 播放，无需额外的 class 移除 / 重添操作。
+ * ============================================================ */
+const VALID_VIEWS = ['home', 'projects', 'library', 'notes', 'skills'];
+
+/* 历史锚点别名映射：兼容旧版页内锚点链接（#books、#top），
+   命中时重定向至对应视图，避免外部已分发的链接失效 */
+const HASH_ALIASES = { books: 'library', top: 'home' };
+
+/* 各视图对应的文档标题 */
+const VIEW_TITLES = {
+  home:     'Machoet · 资料库',
+  projects: 'Machoet · 项目',
+  library:  'Machoet · 书籍资料库',
+  notes:    'Machoet · 笔记',
+  skills:   'Machoet · 技能'
+};
+
+/* 解析 location.hash 为合法视图名；历史锚点按别名表映射，未知或空 hash 回落 'home' */
+function currentView() {
+  const name = location.hash.replace(/^#/, '');
+  if (VALID_VIEWS.includes(name)) return name;
+  if (Object.prototype.hasOwnProperty.call(HASH_ALIASES, name)) return HASH_ALIASES[name];
+  return 'home';
+}
+
+/* 应用指定视图：切换视图容器、同步导航高亮与文档标题、回滚页面顶部 */
+function applyView(view) {
+  document.querySelectorAll('.view').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + view);
+  });
+  document.title = VIEW_TITLES[view] || VIEW_TITLES.home;
+  /* behavior 显式指定 instant，避免全局 scroll-behavior:smooth 在切换时产生平滑回滚；
+     旧版浏览器可能对未知枚举值抛出 TypeError，降级为传统参数形式 */
+  try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); }
+  catch (err) { window.scrollTo(0, 0); }
+}
+
+/* 初始化路由：处理首次进入与 hashchange（含浏览器前进 / 后退） */
+function initRouter() {
+  window.addEventListener('hashchange', () => applyView(currentView()));
+  applyView(currentView());
+}
+
 /* ---- 事件绑定 ---- */
 $('#chipBar').addEventListener('click', e => {
   const btn = e.target.closest('.chip');
@@ -1219,7 +1397,9 @@ renderBooks();
 renderNotes();
 renderProjects();
 renderSkills();
+renderHomeEntries();
 startFooterClock();
+initRouter();
 
 /* ============================================================
  * 背景星空：青白色粒子缓慢漂移 + 闪烁，近距离粒子间连细线。
