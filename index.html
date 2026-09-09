@@ -129,19 +129,19 @@ body {
 .aurora-a {
   width: 58vw; height: 44vw;
   top: -16vw; left: -12vw;
-  background: radial-gradient(closest-side, rgba(69, 232, 255, 0.14), transparent 70%);
+  background: radial-gradient(closest-side, rgba(69, 232, 255, 0.18), transparent 70%);
   animation: aurora-a 68s ease-in-out infinite alternate;
 }
 .aurora-b {
   width: 52vw; height: 40vw;
   top: 24vh; right: -16vw;
-  background: radial-gradient(closest-side, rgba(167, 139, 250, 0.13), transparent 70%);
+  background: radial-gradient(closest-side, rgba(167, 139, 250, 0.17), transparent 70%);
   animation: aurora-b 82s ease-in-out infinite alternate;
 }
 .aurora-c {
   width: 46vw; height: 36vw;
   bottom: -14vw; left: 18vw;
-  background: radial-gradient(closest-side, rgba(255, 95, 210, 0.09), transparent 70%);
+  background: radial-gradient(closest-side, rgba(255, 95, 210, 0.12), transparent 70%);
   animation: aurora-c 96s ease-in-out infinite alternate;
 }
 @keyframes aurora-a {
@@ -158,22 +158,24 @@ body {
 }
 
 /* ---------- 装饰行星：径向渐变球体 + 高光扫掠 + 倾斜光环 ----------
-   固定于视口右下角并部分出界，z-index 位于内容之下，不遮挡阅读区；
+   固定于视口右上方（导航之下），桌面端绝大部分可见；
+   z-index 位于内容之下且 pointer-events:none，不影响交互；
    fixed 定位元素不参与滚动溢出计算，不会引发横向滚动条 */
 .planet {
   position: fixed;
-  right: -70px;
-  bottom: -90px;
-  width: 320px;
-  height: 320px;
+  right: -40px;
+  top: 84px;
+  width: 380px;
+  height: 380px;
   border-radius: 50%;
   z-index: 0;
   pointer-events: none;
   background:
     radial-gradient(circle at 30% 26%, rgba(190, 240, 255, 0.9) 0%, rgba(96, 150, 255, 0.75) 22%, rgba(58, 74, 165, 0.9) 52%, #171f4d 80%);
   box-shadow:
-    inset -34px -28px 70px rgba(5, 8, 24, 0.75),
-    0 0 90px -24px rgba(106, 159, 255, 0.4);
+    inset -40px -34px 84px rgba(5, 8, 24, 0.75),
+    0 0 130px -30px rgba(106, 159, 255, 0.55),
+    0 0 56px -12px rgba(69, 232, 255, 0.35);
 }
 /* 高光扫掠：低透明度光带缓慢明暗呼吸，模拟自转光效（仅 transform / opacity） */
 .planet::before {
@@ -181,14 +183,14 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(118deg, transparent 34%, rgba(69, 232, 255, 0.16) 48%, transparent 62%);
+  background: linear-gradient(118deg, transparent 34%, rgba(69, 232, 255, 0.22) 48%, transparent 62%);
   animation: planet-sheen 14s ease-in-out infinite alternate;
 }
 @keyframes planet-sheen {
   from { opacity: 0.35; transform: rotate(0deg); }
   to   { opacity: 1; transform: rotate(14deg); }
 }
-/* 光环：倾斜椭圆描边，霓虹青与紫的双层辉光 */
+/* 光环：倾斜椭圆描边，霓虹青与紫的双层辉光（加粗提亮） */
 .planet::after {
   content: '';
   position: absolute;
@@ -197,11 +199,34 @@ body {
   width: 172%;
   height: 34%;
   border-radius: 50%;
-  border: 1px solid rgba(157, 243, 255, 0.35);
+  border: 1.5px solid rgba(157, 243, 255, 0.55);
   box-shadow:
-    0 0 18px -4px rgba(167, 139, 250, 0.45),
-    inset 0 0 12px -4px rgba(69, 232, 255, 0.35);
+    0 0 22px -3px rgba(167, 139, 250, 0.6),
+    inset 0 0 16px -3px rgba(69, 232, 255, 0.5);
   transform: translate(-50%, -50%) rotate(-16deg);
+}
+
+/* ---------- 远景卫星：暖橙色小球体，左下方向极缓慢漂浮 ----------
+   与主行星形成冷暖对比与远近层次；动画仅使用 transform */
+.moon {
+  position: fixed;
+  left: 4vw;
+  bottom: 18vh;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255, 214, 170, 0.95) 0%, rgba(255, 150, 92, 0.8) 34%, rgba(150, 70, 60, 0.9) 62%, #3a1f33 85%);
+  box-shadow:
+    inset -12px -10px 26px rgba(20, 8, 18, 0.7),
+    0 0 46px -10px rgba(255, 150, 92, 0.4);
+  animation: moon-float 22s ease-in-out infinite alternate;
+}
+@keyframes moon-float {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(14px, -18px); }
 }
 
 .page {
@@ -917,8 +942,9 @@ footer .footer-links a { border-bottom: none; }
 
 @media (max-width: 640px) {
   .entry-grid { grid-template-columns: 1fr; }
-  /* 移动端缩小行星并降低模糊开销；元素均为 fixed 定位，不产生横向溢出 */
-  .planet { width: 200px; height: 200px; right: -80px; bottom: -70px; }
+  /* 移动端缩小行星与卫星并降低模糊开销；元素均为 fixed 定位，不产生横向溢出 */
+  .planet { width: 180px; height: 180px; right: -50px; top: 66px; }
+  .moon { width: 64px; height: 64px; left: 10px; bottom: 12vh; }
   .aurora i { filter: blur(56px); }
 }
 </style>
@@ -931,6 +957,7 @@ footer .footer-links a { border-bottom: none; }
 <div class="orb orb-a" aria-hidden="true"></div>
 <div class="orb orb-b" aria-hidden="true"></div>
 <div class="planet" aria-hidden="true"></div>
+<div class="moon" aria-hidden="true"></div>
 
 <!-- ============ 顶部导航栏 ============ -->
 <header class="topnav">
@@ -1505,11 +1532,12 @@ startFooterClock();
 initRouter();
 
 /* ============================================================
- * 背景星空：青白色粒子缓慢漂移 + 闪烁，近距离粒子间连细线，
- * 另按随机间隔生成偶发流星（带渐隐尾迹，与星点共用同一画布）。
- * 无外部依赖；requestAnimationFrame 驱动，标签页隐藏时暂停；
- * prefers-reduced-motion 时降级为静态一帧（帧循环不启动，
- * 流星不会生成）。
+ * 背景星空：青白色粒子缓慢漂移 + 闪烁，近距离粒子间连细线；
+ * 按随机间隔生成偶发流星（同屏至多数颗，方向随机，带辉光
+ * 尾迹）；另绘制少量十字星光（缓慢明灭的高亮星体）。
+ * 全部共用同一画布，无外部依赖；requestAnimationFrame 驱动，
+ * 标签页隐藏时暂停；prefers-reduced-motion 时降级为静态一帧
+ * （帧循环不启动，流星不会生成）。
  * ============================================================ */
 (function starfield() {
   const canvas = document.getElementById('starfield');
@@ -1518,26 +1546,30 @@ initRouter();
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LINK_DIST = 110;          // 连线的最大距离（px）
   let stars = [];
+  let flares = [];                // 十字星光：少量高亮星体，亮度缓慢明灭
   let raf = 0;
   let running = false;
 
-  /* 流星状态：同一时间至多一颗；生成间隔按 3–8 秒（60fps 基准，180–480 帧）随机 */
-  let meteor = null;
-  let meteorWait = 180 + Math.random() * 300;
+  /* 流星状态：同屏至多 METEOR_MAX 颗；生成间隔按 2–4 秒（60fps 基准，120–240 帧）随机 */
+  const METEOR_MAX = 3;
+  const meteors = [];
+  let meteorWait = 120 + Math.random() * 120;
 
-  /* 生成一颗流星：自画布上缘随机位置出现，向右下方划过 */
+  /* 生成一颗流星：自画布上缘随机位置出现，
+     方向按左上→右下或右上→左下随机，出生点向反方向侧偏移以保证划过路径 */
   function spawnMeteor() {
+    const dir = Math.random() < 0.5 ? 1 : -1;
     const angle = Math.PI * (0.2 + Math.random() * 0.15);   // 与水平方向的夹角
-    const speed = 7 + Math.random() * 5;
-    meteor = {
-      x: Math.random() * canvas.width * 0.8,
+    const speed = 8 + Math.random() * 6;
+    meteors.push({
+      x: dir > 0 ? Math.random() * canvas.width * 0.7 : canvas.width * (0.3 + Math.random() * 0.7),
       y: -10,
-      vx: Math.cos(angle) * speed,
+      vx: Math.cos(angle) * speed * dir,
       vy: Math.sin(angle) * speed,
-      len: 90 + Math.random() * 70,          // 尾迹长度（px）
+      len: 180 + Math.random() * 120,        // 尾迹长度（px）
       life: 0,
-      maxLife: 90                            // 生命周期上限（帧）
-    };
+      maxLife: 110                           // 生命周期上限（帧）
+    });
   }
 
   function resize() {
@@ -1553,6 +1585,14 @@ initRouter();
       vy: (Math.random() - 0.5) * 0.12,
       tw: Math.random() * Math.PI * 2,            // 闪烁相位
       ts: 0.008 + Math.random() * 0.018           // 闪烁速度
+    }));
+    /* 十字星光：位置随画布尺寸重建，集中于画布上部 70% 区域 */
+    flares = Array.from({ length: 4 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * 0.7,
+      size: 14 + Math.random() * 12,              // 十字光芒半长（px）
+      tw: Math.random() * Math.PI * 2,            // 明灭相位
+      ts: 0.004 + Math.random() * 0.008           // 明灭速度
     }));
   }
 
@@ -1581,27 +1621,55 @@ initRouter();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
     }
-    /* 流星：沿速度反方向绘制线性渐隐尾迹，头部叠加亮点；
-       透明度按生命周期分段淡入淡出，避免生硬出现 / 消失 */
-    if (meteor) {
-      const t = meteor.life / meteor.maxLife;
-      const alpha = t < 0.2 ? t / 0.2 : 1 - (t - 0.2) / 0.8;
-      const sp = Math.hypot(meteor.vx, meteor.vy);
-      const tx = meteor.x - meteor.vx / sp * meteor.len;
-      const ty = meteor.y - meteor.vy / sp * meteor.len;
-      const grad = ctx.createLinearGradient(meteor.x, meteor.y, tx, ty);
-      grad.addColorStop(0, `rgba(210,245,255,${(0.85 * alpha).toFixed(3)})`);
-      grad.addColorStop(1, 'rgba(210,245,255,0)');
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 1.6;
+    /* 十字星光：中心亮核 + 水平 / 垂直光芒，透明度随相位缓慢明灭 */
+    for (const f of flares) {
+      const a = 0.18 + 0.3 * (0.5 + 0.5 * Math.sin(f.tw));
+      ctx.strokeStyle = `rgba(200,240,255,${a.toFixed(3)})`;
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(meteor.x, meteor.y);
+      ctx.moveTo(f.x - f.size, f.y);
+      ctx.lineTo(f.x + f.size, f.y);
+      ctx.moveTo(f.x, f.y - f.size);
+      ctx.lineTo(f.x, f.y + f.size);
+      ctx.stroke();
+      ctx.fillStyle = `rgba(235,250,255,${Math.min(1, a + 0.3).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    /* 流星：双层描边尾迹（外层青色辉光 + 内层近白亮线），
+       头部叠加 shadowBlur 光晕亮点；透明度按生命周期分段淡入淡出 */
+    for (const m of meteors) {
+      const t = m.life / m.maxLife;
+      const alpha = t < 0.15 ? t / 0.15 : 1 - (t - 0.15) / 0.85;
+      const sp = Math.hypot(m.vx, m.vy);
+      const tx = m.x - m.vx / sp * m.len;
+      const ty = m.y - m.vy / sp * m.len;
+      const glow = ctx.createLinearGradient(m.x, m.y, tx, ty);
+      glow.addColorStop(0, `rgba(105,230,255,${(0.5 * alpha).toFixed(3)})`);
+      glow.addColorStop(1, 'rgba(105,230,255,0)');
+      ctx.strokeStyle = glow;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
       ctx.lineTo(tx, ty);
       ctx.stroke();
-      ctx.fillStyle = `rgba(240,252,255,${(0.9 * alpha).toFixed(3)})`;
+      const core = ctx.createLinearGradient(m.x, m.y, tx, ty);
+      core.addColorStop(0, `rgba(245,252,255,${(0.95 * alpha).toFixed(3)})`);
+      core.addColorStop(1, 'rgba(245,252,255,0)');
+      ctx.strokeStyle = core;
+      ctx.lineWidth = 2.6;
       ctx.beginPath();
-      ctx.arc(meteor.x, meteor.y, 1.6, 0, Math.PI * 2);
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      ctx.shadowColor = 'rgba(105,230,255,0.9)';
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = `rgba(250,254,255,${alpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 2.4, 0, Math.PI * 2);
       ctx.fill();
+      ctx.shadowBlur = 0;
     }
   }
 
@@ -1616,19 +1684,23 @@ initRouter();
       if (s.y < -5) s.y = canvas.height + 5;
       else if (s.y > canvas.height + 5) s.y = -5;
     }
-    /* 流星调度与推进：计时归零且无在途流星时生成，
-       越界或超出生命周期后销毁并重置随机间隔 */
-    if (meteor) {
-      meteor.x += meteor.vx;
-      meteor.y += meteor.vy;
-      meteor.life++;
-      if (meteor.life >= meteor.maxLife ||
-          meteor.x > canvas.width + meteor.len || meteor.y > canvas.height + meteor.len) {
-        meteor = null;
-        meteorWait = 180 + Math.random() * 300;
+    /* 十字星光相位推进（仅亮度变化，位置固定） */
+    for (const f of flares) f.tw += f.ts;
+    /* 流星推进与销毁：逆序遍历，越界或超出生命周期时原地移除 */
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      m.x += m.vx;
+      m.y += m.vy;
+      m.life++;
+      if (m.life >= m.maxLife ||
+          m.x < -m.len || m.x > canvas.width + m.len || m.y > canvas.height + m.len) {
+        meteors.splice(i, 1);
       }
-    } else if (--meteorWait <= 0) {
-      spawnMeteor();
+    }
+    /* 流星调度：计时归零时若未达同屏上限则生成，并重置随机间隔 */
+    if (--meteorWait <= 0) {
+      if (meteors.length < METEOR_MAX) spawnMeteor();
+      meteorWait = 120 + Math.random() * 120;
     }
     draw();
     raf = requestAnimationFrame(loop);
