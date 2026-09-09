@@ -168,7 +168,9 @@ body {
                              translateX 平移恰好一个 tile 宽度实现无缝循环，模拟表面自转
    .planet-shade    固定光照层：昼夜明暗交界、顶部高光、大气 rim（光源方向恒定，不随自转移动）
    .planet-shade::before     高光扫掠光带（缓慢明暗呼吸）
-   .planet::after   倾斜光环（绘制于所有子元素之上），附加透明度呼吸 */
+   .planet-ring     光环容器（rotate + scaleY 压扁为倾斜椭圆轨道），前后两实例分居球体下 / 上层
+   .planet-ring::before      正圆环带（conic-gradient 不均匀亮弧 + mask 挖空成环），
+                             360° 匀速旋转模拟环带颗粒环绕行星 */
 .planet {
   position: fixed;
   right: -40px;
@@ -269,22 +271,51 @@ body {
   from { opacity: 0.35; transform: rotate(0deg); }
   to   { opacity: 1; transform: rotate(14deg); }
 }
-/* 光环：倾斜椭圆描边，霓虹青与紫的双层辉光，附加极缓慢透明度呼吸
-   （keyframes 仅声明 opacity，基础 transform 保持不变） */
-.planet::after {
-  content: '';
+/* 光环：双层真实子元素实现“后半在球后、前半在球前”的遮挡关系。
+   外层 .planet-ring 为正方形容器，负责倾斜与压扁（rotate(-16deg) scaleY(0.2)，
+   椭圆视觉尺寸与旧版 172%×34% 描边环一致）并承载透明度呼吸；
+   内层 ::before 为正圆环带：conic-gradient 首尾同色的不均匀亮弧（近白 / 青 / 紫
+   交替，模拟环带颗粒疏密）+ radial-gradient mask 挖空中心成环，
+   rotate 0→360deg 匀速旋转，在容器非均匀缩放下呈现沿椭圆轨道环绕的效果。
+   两实例动画参数完全一致，前后半弧在长轴分割线处旋转相位对齐、衔接无缝 */
+.planet-ring {
   position: absolute;
   left: 50%;
   top: 50%;
   width: 172%;
-  height: 34%;
-  border-radius: 50%;
-  border: 1.5px solid rgba(190, 234, 255, 0.6);
-  box-shadow:
-    0 0 24px -3px rgba(167, 139, 250, 0.65),
-    inset 0 0 18px -3px rgba(69, 232, 255, 0.55);
-  transform: translate(-50%, -50%) rotate(-16deg);
+  height: 172%;
+  transform: translate(-50%, -50%) rotate(-16deg) scaleY(0.2);
   animation: ring-breathe 18s ease-in-out infinite alternate;
+}
+.planet-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(233, 246, 255, 0.85) 0deg,
+    rgba(69, 232, 255, 0.3) 46deg,
+    rgba(167, 139, 250, 0.62) 104deg,
+    rgba(69, 232, 255, 0.16) 158deg,
+    rgba(233, 246, 255, 0.72) 212deg,
+    rgba(167, 139, 250, 0.28) 266deg,
+    rgba(69, 232, 255, 0.55) 314deg,
+    rgba(233, 246, 255, 0.85) 360deg);
+  -webkit-mask: radial-gradient(closest-side, transparent 74%, #000 78%, #000 95%, transparent 99%);
+  mask: radial-gradient(closest-side, transparent 74%, #000 78%, #000 95%, transparent 99%);
+  animation: ring-spin 12s linear infinite;
+  will-change: transform;
+}
+/* 后半环：DOM 顺序绘制在球体之下，整体调暗体现纵深
+   （opacity 置于内层，避免被容器的 ring-breathe 呼吸动画覆盖） */
+.planet-ring-back::before { opacity: 0.55; }
+/* 前半环：clip-path 作用于自身坐标系（transform 之前），裁掉上半后
+   经旋转压扁恰沿椭圆长轴保留下半弧，即靠近观察者的前侧轨道 */
+.planet-ring-front { clip-path: inset(50% 0 0 0); }
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 @keyframes ring-breathe {
   from { opacity: 0.6; }
@@ -1041,7 +1072,7 @@ footer .footer-links a { border-bottom: none; }
 <canvas id="starfield" aria-hidden="true"></canvas>
 <div class="orb orb-a" aria-hidden="true"></div>
 <div class="orb orb-b" aria-hidden="true"></div>
-<div class="planet" aria-hidden="true"><i class="planet-surface"></i><i class="planet-shade"></i></div>
+<div class="planet" aria-hidden="true"><i class="planet-ring planet-ring-back"></i><i class="planet-surface"></i><i class="planet-shade"></i><i class="planet-ring planet-ring-front"></i></div>
 <div class="moon" aria-hidden="true"></div>
 
 <!-- ============ 顶部导航栏 ============ -->
