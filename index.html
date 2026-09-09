@@ -157,10 +157,18 @@ body {
   to   { transform: translate(7vw, -5vh) scale(1.22); }
 }
 
-/* ---------- 装饰行星：径向渐变球体 + 高光扫掠 + 倾斜光环 ----------
+/* ---------- 装饰行星：气态巨行星（条带纹理自转 + 固定光照 + 倾斜光环） ----------
    固定于视口右上方（导航之下），桌面端绝大部分可见；
    z-index 位于内容之下且 pointer-events:none，不影响交互；
-   fixed 定位元素不参与滚动溢出计算，不会引发横向滚动条 */
+   fixed 定位元素不参与滚动溢出计算，不会引发横向滚动条。
+   分层结构（自下而上）：
+   .planet          定位容器 + 外部大气辉光（box-shadow），不裁剪，保证光环可出界
+   .planet-surface  横向云带底色，overflow:hidden 裁剪内部纹理层
+   .planet-surface::before  200% 宽移动纹理层（风暴斑 + 竖向光带），
+                             translateX 平移恰好一个 tile 宽度实现无缝循环，模拟表面自转
+   .planet-shade    固定光照层：昼夜明暗交界、顶部高光、大气 rim（光源方向恒定，不随自转移动）
+   .planet-shade::before     高光扫掠光带（缓慢明暗呼吸）
+   .planet::after   倾斜光环（绘制于所有子元素之上），附加透明度呼吸 */
 .planet {
   position: fixed;
   right: -40px;
@@ -170,27 +178,96 @@ body {
   border-radius: 50%;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 30% 26%, rgba(190, 240, 255, 0.9) 0%, rgba(96, 150, 255, 0.75) 22%, rgba(58, 74, 165, 0.9) 52%, #171f4d 80%);
   box-shadow:
-    inset -40px -34px 84px rgba(5, 8, 24, 0.75),
     0 0 130px -30px rgba(106, 159, 255, 0.55),
     0 0 56px -12px rgba(69, 232, 255, 0.35);
 }
-/* 高光扫掠：低透明度光带缓慢明暗呼吸，模拟自转光效（仅 transform / opacity） */
-.planet::before {
+/* 表面层：横向云带底色（青蓝主调 + 紫 / 白点缀），模拟气态行星大气条带 */
+.planet-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    #2b3a74 0%,
+    #46619f 7%,
+    #8fd0f0 13%,
+    #3c4f96 20%,
+    #5a74c4 28%,
+    #a9cbf6 35%,
+    #35459a 43%,
+    #6b8fd8 52%,
+    #8b7ce0 59%,
+    #31408c 67%,
+    #5570bd 76%,
+    #283569 87%,
+    #1a2450 100%);
+}
+/* 移动纹理层：宽 200%，tile 宽为行星直径（background-size:50% 100% + repeat-x），
+   translateX 从 0 到 -50%（恰为一个 tile）后循环，视觉无缝；
+   风暴斑与光带均使用百分比尺寸 / 定位且首尾透明，不跨 tile 边界，避免接缝 */
+.planet-surface::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background:
+    radial-gradient(ellipse 16% 7% at 30% 37%, rgba(233, 246, 255, 0.5) 0%, rgba(233, 246, 255, 0) 100%),
+    radial-gradient(ellipse 12% 5% at 68% 61%, rgba(167, 139, 250, 0.45) 0%, rgba(167, 139, 250, 0) 100%),
+    radial-gradient(ellipse 10% 4% at 82% 26%, rgba(69, 232, 255, 0.42) 0%, rgba(69, 232, 255, 0) 100%),
+    radial-gradient(ellipse 14% 5% at 15% 72%, rgba(210, 230, 255, 0.35) 0%, rgba(210, 230, 255, 0) 100%),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(190, 226, 255, 0.14) 12%,
+      rgba(255, 255, 255, 0) 26%,
+      rgba(120, 150, 255, 0.12) 45%,
+      rgba(255, 255, 255, 0) 60%,
+      rgba(69, 232, 255, 0.1) 78%,
+      rgba(255, 255, 255, 0) 100%);
+  background-size: 50% 100%;
+  background-repeat: repeat-x;
+  animation: planet-spin 96s linear infinite;
+  will-change: transform;
+}
+@keyframes planet-spin {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+/* 固定光照层：顶部高光 + 昼夜明暗交界（terminator）+ 边缘减光 + 青色大气 rim；
+   该层不参与自转动画，保证光源方向恒定、球体立体感稳定 */
+.planet-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at 76% 84%, rgba(4, 7, 22, 0.78) 0%, rgba(4, 7, 22, 0) 52%),
+    radial-gradient(circle at 30% 26%, rgba(4, 7, 22, 0) 50%, rgba(6, 10, 28, 0.5) 78%, rgba(4, 7, 22, 0.88) 100%);
+  box-shadow:
+    inset -34px -30px 80px rgba(4, 7, 22, 0.8),
+    inset 0 0 2px rgba(190, 240, 255, 0.55),
+    inset 0 0 30px rgba(69, 232, 255, 0.32),
+    inset 3px 4px 18px rgba(190, 240, 255, 0.35);
+}
+/* 高光扫掠：低透明度光带缓慢明暗呼吸（仅 transform / opacity）；
+   置于 .planet-shade 的伪元素上以确保绘制在纹理层之上 */
+.planet-shade::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(118deg, transparent 34%, rgba(69, 232, 255, 0.22) 48%, transparent 62%);
+  background: linear-gradient(118deg, transparent 34%, rgba(69, 232, 255, 0.16) 48%, transparent 62%);
   animation: planet-sheen 14s ease-in-out infinite alternate;
 }
 @keyframes planet-sheen {
   from { opacity: 0.35; transform: rotate(0deg); }
   to   { opacity: 1; transform: rotate(14deg); }
 }
-/* 光环：倾斜椭圆描边，霓虹青与紫的双层辉光（加粗提亮） */
+/* 光环：倾斜椭圆描边，霓虹青与紫的双层辉光，附加极缓慢透明度呼吸
+   （keyframes 仅声明 opacity，基础 transform 保持不变） */
 .planet::after {
   content: '';
   position: absolute;
@@ -199,11 +276,16 @@ body {
   width: 172%;
   height: 34%;
   border-radius: 50%;
-  border: 1.5px solid rgba(157, 243, 255, 0.55);
+  border: 1.5px solid rgba(190, 234, 255, 0.6);
   box-shadow:
-    0 0 22px -3px rgba(167, 139, 250, 0.6),
-    inset 0 0 16px -3px rgba(69, 232, 255, 0.5);
+    0 0 24px -3px rgba(167, 139, 250, 0.65),
+    inset 0 0 18px -3px rgba(69, 232, 255, 0.55);
   transform: translate(-50%, -50%) rotate(-16deg);
+  animation: ring-breathe 18s ease-in-out infinite alternate;
+}
+@keyframes ring-breathe {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
 }
 
 /* ---------- 远景卫星：暖橙色小球体，左下方向极缓慢漂浮 ----------
@@ -956,7 +1038,7 @@ footer .footer-links a { border-bottom: none; }
 <canvas id="starfield" aria-hidden="true"></canvas>
 <div class="orb orb-a" aria-hidden="true"></div>
 <div class="orb orb-b" aria-hidden="true"></div>
-<div class="planet" aria-hidden="true"></div>
+<div class="planet" aria-hidden="true"><i class="planet-surface"></i><i class="planet-shade"></i></div>
 <div class="moon" aria-hidden="true"></div>
 
 <!-- ============ 顶部导航栏 ============ -->
