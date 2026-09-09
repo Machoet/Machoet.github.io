@@ -1078,7 +1078,8 @@ footer .footer-links a { border-bottom: none; }
   <header class="hero" id="top">
     <p class="hero-eyebrow rise" style="animation-delay:.05s">MACHOET.GITHUB.IO</p>
     <div class="avatar rise" style="animation-delay:.12s">
-      <img src="https://github.com/Machoet.png" alt="Machoet"
+      <!-- 头像自托管于仓库 assets 目录，同域相对路径加载，避免 avatars.githubusercontent.com 在受限网络下被阻断 -->
+      <img src="assets/avatar.jpg" alt="Machoet"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
       <span class="avatar-fallback" aria-hidden="true">M</span>
     </div>
